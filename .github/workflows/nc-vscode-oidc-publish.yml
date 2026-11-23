@@ -1,0 +1,39 @@
+name: nC Language - Trusted VS Code Marketplace publishing
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish verified nC VSIX through the Marketplace trusted publisher policy"
+        required: true
+        default: false
+        type: boolean
+permissions:
+  contents: read
+jobs:
+  publish:
+    if: inputs.publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate nC editing, debugging, LSP and icon
+        working-directory: tools/vscode/nc-language
+        run: npm run test
+      - name: Create verified nC VSIX
+        working-directory: tools/vscode/nc-language
+        run: npm run package:vsix
+      - name: Publish to existing nc-lang publisher using GitHub OIDC
+        working-directory: tools/vscode/nc-language
+        run: |
+          npx --yes @vscode/vsce@latest publish --oidc --packagePath dist/nc-language-1.0.0-22v.vsix
