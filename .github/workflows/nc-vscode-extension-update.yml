@@ -25,8 +25,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: tools/vscode/nc-language
-          filter: blob:none
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
