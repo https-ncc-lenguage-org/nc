@@ -76,7 +76,7 @@ class NcRunConfiguration(
     }
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
-        return NcCommandLineState(environment, this, executor.id == DefaultDebugExecutor.EXECUTOR_ID || debugRun)
+        return NcCommandLineState(environment, this, executor.id == NC_DEBUG_EXECUTOR_ID || debugRun)
     }
 
     override fun readExternal(element: Element) {
