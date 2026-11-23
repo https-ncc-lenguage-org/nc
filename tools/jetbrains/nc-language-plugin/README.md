@@ -58,7 +58,7 @@ The plugin still does not own language semantics. All parser, sema, IR and machi
 - Palette mapping file:
   - `resources/nc_colors.json`
 
-## JetBrains 261 migration status
+## JetBrains 261 migration status (historical)
 
 - Gradle IntelliJ Plugin 1.x removed.
 - IntelliJ Platform Gradle Plugin 2.x enabled (`org.jetbrains.intellij.platform`).
@@ -127,3 +127,11 @@ Licensed under either of:
 at your option.
 
 SPDX-License-Identifier: MIT OR Apache-2.0
+
+## RustRover 2026.3.1 · IntelliJ Platform 263 · 1.0.0.22v
+
+The existing PSI lexer, highlighter, completion, navigation, inlays, Run/Debug configurations, and toolchain integration remain in place. A project-wide LSP client now starts for supported nC source files: `.n` through a persistent Python 3 stdio bridge for `nclsp validate` (diagnostics and document synchronization only), and `.nb`, `.nbb`, `.nm`, `.ncp` through `nc-sys-lsp lsp`. `.nbo` remains an IR view and `.nc` remains a compiler alias without JetBrains file-type ownership.
+
+The bridge validates unsaved editor text using a temporary file outside the repository. This can differ from project-relative imports, so NCC project checks remain authoritative. Use `NC_PYTHON_BIN`, `NC_NCLSP_BIN`, or `NC_SYS_LSP_BIN` to override executable discovery.
+
+Build on JDK 25 with Gradle 9.2.1 against RustRover 2026.3.1 and run Plugin Verifier before publishing. Marketplace publication is a separate manual step.
