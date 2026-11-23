@@ -4,7 +4,7 @@ import com.intellij.execution.ProgramRunnerUtil
 import com.intellij.execution.RunManager
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.ConfigurationTypeUtil
-import com.intellij.execution.executors.DefaultDebugExecutor
+import com.intellij.execution.ExecutorRegistry
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -50,7 +50,12 @@ private fun launch(event: AnActionEvent, debug: Boolean) {
     configuration.filePath = file.path
     configuration.debugRun = debug
     if (debug) {
-        ProgramRunnerUtil.executeConfiguration(settings, DefaultDebugExecutor.getDebugExecutorInstance())
+        val executor = ExecutorRegistry.getInstance().getExecutorById(NC_DEBUG_EXECUTOR_ID)
+        if (executor == null) {
+            Messages.showErrorDialog("Debug executor is not available in this IDE.", "nC Debug")
+            return
+        }
+        ProgramRunnerUtil.executeConfiguration(settings, executor)
     } else {
         ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance())
     }

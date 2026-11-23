@@ -4,12 +4,12 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "2.3.0"
+    kotlin("jvm") version "2.4.21"
     id("org.jetbrains.intellij.platform")
 }
 
 group = "dev.nc"
-version = "1.0.0.21v"
+version = "1.0.22"
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
@@ -21,24 +21,23 @@ dependencies {
     intellijPlatform {
         testFramework(TestFrameworkType.Platform)
 
-        intellijIdea("2026.1")
-        bundledPlugin("com.intellij.java")
+        rustRover("2026.3.1")
     }
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(25)
 }
 
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_21)
+        jvmTarget.set(JvmTarget.JVM_25)
     }
 }
 
@@ -46,14 +45,14 @@ intellijPlatform {
     pluginConfiguration {
         version = project.version.toString()
         description = """
-            nC JetBrains integration.
-            Semantic authority remains in ncc.
+            nC editing for RustRover 2026.3.1: syntax support, navigation, Run/Debug and persistent LSP sessions.
+            Compiler authority remains in NCC.
             License: MIT OR Apache-2.0.
         """.trimIndent()
-        changeNotes = "1.0.0.21v: canonical compact syntax, extension-aware colors, raw pointer aliases, backend prelude awareness and permissive return ABI."
+        changeNotes = "1.0.22 (nC product 1.0.0.22v): Marketplace-compatible version and 40px plugin logos; RustRover 2026.3.1, persistent LSP diagnostics and native editor integrations preserved."
         ideaVersion {
-            sinceBuild = "242"
-untilBuild = "262.*"
+            sinceBuild = "263"
+            untilBuild = "263.*"
         }
     }
 }
