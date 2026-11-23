@@ -11,7 +11,7 @@ class ContractTests(unittest.TestCase):
         self.assertIn('com.intellij.modules.lsp', deps)
         self.assertIn('com.intellij.modules.ultimate', deps)
         self.assertEqual(root.find('id').text, 'dev.nc.language')
-        self.assertEqual(root.find('version').text, '1.0.0.22v')
+        self.assertEqual(root.find('version').text, '1.0.22')
         extensions = root.findall('.//fileType')
         self.assertEqual({e.attrib['extensions'] for e in extensions}, {'n','nb','nbb','nm','nbo','ncp'})
         tags = [el.tag for el in root.iter()]

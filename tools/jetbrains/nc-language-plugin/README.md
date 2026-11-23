@@ -6,9 +6,11 @@ nC Language Plugin is the official JetBrains-side integration for nC. It provide
 
 Semantic authority remains in ncc.
 
-## Version 1.0.0.21v
+## Release 1.0.22 (nC product 1.0.0.22v)
 
-`1.0.0.21v` is the canonical plugin baseline. It retains live compiler diagnostics, semantic colors, completion, hover documentation, navigation, references, symbols, rename, quick fixes, Run/Debug, toolchain resolution and stable project/lane routing.
+The JetBrains Marketplace version is `1.0.22`. The product and capability-contract version remains `1.0.0.22v`; it is not used as the plugin version because new Marketplace listings enable SemVer validation by default. The plugin ID remains `dev.nc.language` for subsequent updates.
+
+This release builds on the `1.0.0.21v` editor baseline and the `1.0.0.22v` RustRover/LSP integration. It retains live compiler diagnostics, semantic colors, completion, hover documentation, navigation, references, symbols, rename, quick fixes, Run/Debug, toolchain resolution and stable project/lane routing.
 
 The plugin still does not own language semantics. All parser, sema, IR and machine truth remains delegated to `ncc`.
 
@@ -134,4 +136,14 @@ The existing PSI lexer, highlighter, completion, navigation, inlays, Run/Debug c
 
 The bridge validates unsaved editor text using a temporary file outside the repository. This can differ from project-relative imports, so NCC project checks remain authoritative. Use `NC_PYTHON_BIN`, `NC_NCLSP_BIN`, or `NC_SYS_LSP_BIN` to override executable discovery.
 
-Build on JDK 25 with Gradle 9.2.1 against RustRover 2026.3.1 and run Plugin Verifier before publishing. Marketplace publication is a separate manual step.
+Build on JDK 25 with Gradle 9.2.1 against RustRover 2026.3.1 and run Plugin Verifier before publishing. The first Marketplace upload is manual; later updates use the existing `dev.nc.language` listing and a higher SemVer version.
+
+## Marketplace publication
+
+The release archive is `build/distributions/nc-language-plugin-1.0.22.zip`. Install that ZIP from disk in RustRover and verify the installed toolchain before submitting it. The bundled plugin logos follow the 40px SVG size required by JetBrains.
+
+For the first submission, upload the ZIP through JetBrains Marketplace, select the vendor profile, and provide the source URL and the existing `MIT OR Apache-2.0` license. Upload acceptance and review approval are separate states.
+
+The `.github/workflows/nc-jetbrains-marketplace-update.yml` workflow builds, verifies and optionally publishes an update when manually dispatched. It does not publish on every push. After the listing is approved, configure the repository secret `PUBLISH_TOKEN`; IntelliJ Platform Gradle Plugin reads that environment variable by default. Keep `publish` disabled for verification-only runs. GitHub requires this manually dispatched workflow to exist on the default branch before it can be run from the Actions UI.
+
+References: [JetBrains publication](https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html), [Marketplace SemVer](https://plugins.jetbrains.com/docs/marketplace/semver.html), and [plugin logos](https://plugins.jetbrains.com/docs/intellij/plugin-icon-file.html).

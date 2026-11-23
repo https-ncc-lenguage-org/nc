@@ -2,7 +2,7 @@
     <id>dev.nc.language</id>
     <name>nC Language</name>
     <vendor email="oss@nc.dev" url="https://github.com/https-ncc-lenguage-org/nc">nC Project</vendor>
-    <version>1.0.0.22v</version>
+    <version>1.0.22</version>
     <idea-version since-build="263" until-build="263.*"/>
     <description>
         <![CDATA[

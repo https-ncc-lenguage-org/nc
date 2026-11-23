@@ -2,6 +2,8 @@
 
 **nC Language** brings first-class nC editing workflows to RustRover, with distinct source-family support, syntax-aware tools, project navigation and integration with the installed nC toolchain.
 
+Marketplace release: **1.0.22**. nC product and capability-contract version: **1.0.0.22v**. Stable plugin ID: **`dev.nc.language`**.
+
 Write nC in a JetBrains environment without giving up the language's different execution surfaces. The plugin recognizes `.n` source files, `.nb` basal/root units, `.nbb` primitive units, `.nm` machine sources, `.nbo` backend object IR and `.ncp` hardware sources. Each family retains its intended highlighting and file identity.
 
 ## Code intelligence and editing

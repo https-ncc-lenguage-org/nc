@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "dev.nc"
-version = "1.0.0.22v"
+version = "1.0.22"
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
@@ -49,7 +49,7 @@ intellijPlatform {
             Compiler authority remains in NCC.
             License: MIT OR Apache-2.0.
         """.trimIndent()
-        changeNotes = "1.0.0.22v: RustRover 2026.3.1, persistent LSP diagnostics, native editor integrations preserved."
+        changeNotes = "1.0.22 (nC product 1.0.0.22v): Marketplace-compatible version and 40px plugin logos; RustRover 2026.3.1, persistent LSP diagnostics and native editor integrations preserved."
         ideaVersion {
             sinceBuild = "263"
             untilBuild = "263.*"
