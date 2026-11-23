@@ -1,18 +1,21 @@
 <idea-plugin>
     <id>dev.nc.language</id>
     <name>nC Language</name>
-    <vendor email="oss@nc.dev" url="https://github.com/aristtote/nc-language.git">nC Project</vendor>
-    <version>1.0.0.21v</version>
-    <idea-version since-build="242" until-build="262.*"/>
+    <vendor email="oss@nc.dev" url="https://github.com/https-ncc-lenguage-org/nc">nC Project</vendor>
+    <version>1.0.0.22v</version>
+    <idea-version since-build="263" until-build="263.*"/>
     <description>
         <![CDATA[
-        Official nC language integration for JetBrains IDEs.
-        Routes high-level files to nclsp and machine files to nc-sys-lsp.
-        Semantic authority remains in ncc.
+        nC language support for RustRover 2026.3.1: syntax highlighting, completion,
+        navigation, inlay hints, Run/Debug and persistent LSP sessions.
+        The general nclsp bridge provides diagnostics. nc-sys-lsp handles low-level sources.
+        Compiler semantics remain in ncc.
         License: MIT OR Apache-2.0.
         ]]>
     </description>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lsp</depends>
+    <depends>com.intellij.modules.ultimate</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <fileType name="nC Source" implementationClass="dev.nc.jetbrains.NcFileType" fieldName="INSTANCE" language="nC" extensions="n"/>
@@ -34,6 +37,10 @@
         <configurationType implementation="dev.nc.jetbrains.NcRunConfigurationType"/>
         <runConfigurationProducer implementation="dev.nc.jetbrains.NcRunConfigurationProducer"/>
         <programRunner implementation="dev.nc.jetbrains.NcDebugProgramRunner"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij.platform.lsp">
+        <integrationProvider implementation="dev.nc.jetbrains.NcLspIntegrationProvider"/>
     </extensions>
 
     <actions>
