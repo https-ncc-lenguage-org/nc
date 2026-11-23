@@ -1,3 +1,10 @@
+## 1.0.0.22v
+
+- Persistent nC LSP diagnostic sessions (general and low-level), with unsaved document synchronization.
+- Native nC DAP debugger retained; no new debugging capabilities advertised beyond the adapter.
+- Official nC hexagon icon preserved for Marketplace and file types.
+- Updated canonical GitHub repository, release metadata and Marketplace packaging.
+
 # Changelog
 
 ## 1.0.0.21v

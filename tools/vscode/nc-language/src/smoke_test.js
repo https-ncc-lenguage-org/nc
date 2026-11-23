@@ -101,8 +101,8 @@ function main() {
   assert(projectionHit && projectionHit.entry.label === 'load T [address]', 'semantic dictionary must resolve material load');
 
   assert.strictEqual(pkg.license, 'MIT OR Apache-2.0');
-  assert.strictEqual(pkg.version, '1.0.0-21v');
-  assert.strictEqual(pkg.ncProductVersion, '1.0.0.21v');
+  assert.strictEqual(pkg.version, '1.0.0-22v');
+  assert.strictEqual(pkg.ncProductVersion, '1.0.0.22v');
   assert.strictEqual(pkg.ncProfessionalIdeParity?.tier, 'c_cpp_rust_java_grade');
   for (const lang of ['c', 'cpp', 'rust', 'java']) {
     assert(pkg.ncProfessionalIdeParity.referenceLanguages.includes(lang), `professional parity missing ${lang}`);
@@ -151,7 +151,7 @@ function main() {
   assert(pkg.repository && pkg.repository.url);
   assert(pkg.scripts && pkg.scripts.test && pkg.scripts['package:vsix']);
   assert(pkg.scripts['package:vsix'].includes('--out dist/'), 'package:vsix must output to dist/');
-  assert(pkg.scripts['package:vsix'].includes('nc-language-1.0.0-21v.vsix'), 'package:vsix must target the 1.0.0.21v artifact');
+  assert(pkg.scripts['package:vsix'].includes('nc-language-1.0.0-22v.vsix'), 'package:vsix must target the 1.0.0.22v artifact');
   assert.strictEqual(pkg.icon, 'assets/nc-logo-128.png', 'VS Code package icon must use the nC logo asset');
   assert.strictEqual(pkg.contributes.configuration.properties['nc.editorAssistHints'].default, true, 'editor assist hints must default on');
   assert.strictEqual(pkg.contributes.configuration.properties['nc.inlayHints.parameters'].default, true, 'parameter inlay hints must default on');

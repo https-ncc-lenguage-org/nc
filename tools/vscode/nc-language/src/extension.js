@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const vscode = require('vscode');
+const {startNcPersistentLsp} = require('./nc_persistent_lsp');
 const cp = require('child_process');
 const fs = require('fs');
 const os = require('os');

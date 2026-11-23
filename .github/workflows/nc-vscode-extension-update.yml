@@ -1,0 +1,64 @@
+name: nC VS Code - test, package and Marketplace update
+on:
+  pull_request:
+    paths:
+      - 'tools/vscode/nc-language/**'
+      - '.github/workflows/nc-vscode-extension-update.yml'
+  push:
+    branches: [main, 'feature/vscode-nc-1-0-0-22v-lsp-debug-icon']
+    paths:
+      - 'tools/vscode/nc-language/**'
+      - '.github/workflows/nc-vscode-extension-update.yml'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the verified VSIX to the existing VS Code Marketplace listing
+        required: true
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  verify-and-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test existing editor, DAP and LSP routing
+        working-directory: tools/vscode/nc-language
+        run: |
+          node --check src/extension.js
+          node --check src/nc_persistent_lsp.js
+          npm run test
+          python -m py_compile bin/nclsp_stdio_adapter.py
+      - name: Build VSIX with official nC logo
+        working-directory: tools/vscode/nc-language
+        run: npm run package:vsix
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nC-Language-1.0.0-22v-VSCode
+          path: tools/vscode/nc-language/dist/nc-language-1.0.0-22v.vsix
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish as direct update to VS Code Marketplace
+        if: >-
+          (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+          (github.event_name == 'workflow_dispatch' && inputs.publish)
+        working-directory: tools/vscode/nc-language
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -z "$VSCE_PAT" ]; then
+            echo "::warning::VSCE_PAT is not configured; verified VSIX uploaded, Marketplace not updated."
+            exit 0
+          fi
+          npx --yes @vscode/vsce@3 publish --no-dependencies \
+            --packagePath dist/nc-language-1.0.0-22v.vsix

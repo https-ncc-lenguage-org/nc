@@ -6,11 +6,19 @@ nC Language is the official editor integration for the nC programming language. 
 
 The extension provides editor assistance and delegates compiler-backed checks to the installed toolchain.
 
-## Version 1.0.0.21v
+## Version 1.0.0.22v
 
-`1.0.0.21v` is the canonical plugin baseline. The VS Code marketplace manifest uses the valid SemVer form `1.0.0-21v`, while `ncProductVersion` records the exact product version.
+`1.0.0.22v` extends the official editor integration; the 1.0.0.21v language catalogs remain compatible. The VS Code marketplace manifest uses the valid SemVer form `1.0.0-22v`, while `ncProductVersion` records the exact product version.
 
 The required surface is comparable to mature C, C++, Rust and Java editor integrations: live compiler diagnostics, semantic tokens, predictive completion, hover documentation, inlay hints, definitions, references, document symbols, safe rename, quick fixes, CodeLens run/debug/check actions, run/check/format actions, toolchain resolution and mode-aware routing for machine and primitive files.
+
+## Persistent LSP and debugging (1.0.0.22v)
+
+The extension starts project-scoped, persistent JSON-RPC language sessions for supported nC documents. High-level `.n` uses a bundled diagnostic bridge to the installed `nclsp validate`; low-level `.nb`, `.nbb`, `.nm` and `.ncp` use `nc-sys-lsp lsp`. Document edits are synchronized before save and each server publishes diagnostics. `nc.persistentLsp` disables this client without disabling existing compiler diagnostics.
+
+The existing native nC Debug Adapter Protocol integration remains available: launch, breakpoints, stack traces, stepping, scopes and variables depend on the capabilities announced by the installed NCC adapter. Machine `.nm` remains a manual terminal/inspection surface and is not advertised as an IDE DAP target.
+
+The Marketplace icon and file-type visuals use the official nC hexagon logo (`assets/nc-logo-128.png` and `assets/file-icons/`). This update retains the same extension identity `nc-lang.nc-language` for seamless upgrades.
 
 ## Visual identity
 

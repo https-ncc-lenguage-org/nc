@@ -1,9 +1,9 @@
 {
   "name": "nc-language",
   "displayName": "nC Language",
-  "description": "Official language support for nC: C/C++/Rust/Java-grade editing surface with syntax highlighting, semantic tokens, snippets, themes, file icons, and integration with ncc, nide, nclsp and nc-sys-lsp.",
-  "version": "1.0.0-21v",
-  "ncProductVersion": "1.0.0.21v",
+  "description": "nC language support for VS Code: persistent LSP diagnostics, compiler-backed tooling, DAP debugging, syntax highlighting, navigation, completion, themes and official icons.",
+  "version": "1.0.0-22v",
+  "ncProductVersion": "1.0.0.22v",
   "ncProfessionalIdeParity": {
     "tier": "c_cpp_rust_java_grade",
     "referenceLanguages": [
@@ -66,7 +66,7 @@
   "license": "MIT OR Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aristtote/nc-language.git"
+    "url": "https://github.com/https-ncc-lenguage-org/nc.git"
   },
   "engines": {
     "vscode": "^1.85.0"
@@ -1320,6 +1320,11 @@
           "type": "boolean",
           "default": true,
           "markdownDescription": "Show inferred expression type hints when the visible source makes a local projection type obvious."
+        },
+        "nc.persistentLsp": {
+          "type": "boolean",
+          "default": true,
+          "description": "Start persistent nC LSP sessions for source and system files. Existing compiler diagnostics and debugger remain available."
         }
       }
     },
@@ -1333,8 +1338,8 @@
   },
   "scripts": {
     "lint": "node -e \"JSON.parse(require('fs').readFileSync('./package.json','utf8')); console.log('package.json OK');\"",
-    "test": "node ./src/smoke_test.js",
-    "package:vsix": "node -e \"require('fs').mkdirSync('dist',{recursive:true})\" && corepack prepare pnpm@8.15.8 --activate && corepack pnpm dlx @vscode/vsce package --no-dependencies --out dist/nc-language-1.0.0-21v.vsix"
+    "test": "node ./src/smoke_test.js && node ./src/nc_persistent_lsp_test.js",
+    "package:vsix": "node -e \"require('fs').mkdirSync('dist',{recursive:true})\" && npx --yes @vscode/vsce@3 package --no-dependencies --out dist/nc-language-1.0.0-22v.vsix"
   },
   "keywords": [
     "nC",
