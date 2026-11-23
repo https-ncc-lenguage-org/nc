@@ -1,0 +1,55 @@
+name: nC Language - JetBrains Marketplace verified update
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish update to EXISTING approved dev.nc.language listing'
+        required: true
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  verify-and-optional-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/jetbrains/nc-language-plugin
+          filter: blob:none
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: '9.2.1'
+      - name: Validate native editor and LSP contracts
+        working-directory: tools/jetbrains/nc-language-plugin
+        run: python -m unittest discover -s tests -v
+      - name: Package and verify RustRover 263
+        working-directory: tools/jetbrains/nc-language-plugin
+        run: |
+          gradle --no-daemon --console=plain clean buildPlugin verifyPluginProjectConfiguration
+          gradle --no-daemon --console=plain verifyPlugin
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nC-Language-JetBrains-verified-update
+          path: tools/jetbrains/nc-language-plugin/build/distributions/*.zip
+          if-no-files-found: error
+      - name: Publish only after first Marketplace approval
+        if: inputs.publish
+        working-directory: tools/jetbrains/nc-language-plugin
+        env:
+          PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+        run: |
+          if [ -z "$PUBLISH_TOKEN" ]; then
+            echo "::error::Configure JetBrains Marketplace PUBLISH_TOKEN in repository secrets."
+            exit 1
+          fi
+          gradle --no-daemon --console=plain publishPlugin
