@@ -1,0 +1,12 @@
+primitive[@] primitiveSample {
+    target:
+        arch: x86_64;
+
+    operation:
+        initPrimitive {
+            emit: primitive_valid;
+        }
+
+    seal:
+        primitiveWindow;
+}
