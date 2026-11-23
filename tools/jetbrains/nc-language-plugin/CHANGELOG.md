@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0.22v (candidate)
+
+- Target RustRover 2026.3.1, IntelliJ Platform 263, JDK 25.
+- Start persistent LSP sessions for supported nC sources.
+- Add general nclsp validation bridge and direct low-level nc-sys-lsp client.
+- Preserve PSI-based completion, navigation, Run/Debug and existing file families.
+- Expand Marketplace metadata and add isolated validation workflow.
+- No compiler source changes.
+
+
 ## 1.0.0.21v
 
 - Established `1.0.0.21v` as the new JetBrains plugin version baseline.
