@@ -1,11 +1,16 @@
 {
   "schema": "nc.jetbrains.plugin.capabilities.v1",
-  "version": "1.0.0.21v",
+  "version": "1.0.0.22v",
   "state": "frozen",
   "semantic_authority": "ncc",
   "professional_ide_parity": {
     "tier": "c_cpp_rust_java_grade",
-    "reference_languages": ["c", "cpp", "rust", "java"],
+    "reference_languages": [
+      "c",
+      "cpp",
+      "rust",
+      "java"
+    ],
     "source_of_truth": "ncc",
     "required_surfaces": [
       "live_compiler_diagnostics",
@@ -30,7 +35,13 @@
   "lsp_routing": {
     "high_level": "nclsp",
     "low_level": "nc-sys-lsp",
-    "trigger_extensions": [".n", ".nb", ".nbb", ".nm", ".ncp"]
+    "trigger_extensions": [
+      ".n",
+      ".nb",
+      ".nbb",
+      ".nm",
+      ".ncp"
+    ]
   },
   "marketplace_capabilities": [
     "live_diagnostics",
@@ -59,5 +70,13 @@
     "docs/spec/root/base_inputs/nc_print_family_base.md",
     "docs/spec/root/base_inputs/nc_runtime_api_90_familias.md",
     "docs/spec/root/base_inputs/nC_consola_impresion_total.md"
-  ]
+  ],
+  "lsp_session": {
+    "general": "nclsp validate via persistent JSON-RPC diagnostics bridge",
+    "low_level": "nc-sys-lsp lsp",
+    "integration": "JetBrains LspIntegrationProvider",
+    "platform": "263",
+    "semantic_authority": "ncc",
+    "limits": "general bridge exposes text sync and diagnostics, not completion/hover/rename"
+  }
 }
