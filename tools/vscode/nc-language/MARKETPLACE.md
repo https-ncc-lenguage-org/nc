@@ -8,6 +8,10 @@ nC Language
 
 Official language support for nC: syntax highlighting, semantic tokens, snippets, hover, inlay hints, Run/Debug actions, nC Sovereign Dark theme, file icons, and integration with ncc, nclsp and nc-sys-lsp.
 
+## Update 1.0.0.22v
+
+Persistent LSP sessions synchronize unsaved nC documents, use `nc-sys-lsp lsp` for system and machine files and a `nclsp validate` bridge for general diagnostics. Existing native DAP debugging, high-level completion, navigation, syntax support and user-selected color/icon themes are preserved. The nC hexagon remains the official Marketplace and file icon. The extension's identifier is unchanged, so Marketplace installs can receive updates normally.
+
 ## Long description
 
 nC Language provides editor support for the nC programming language. nC is a contract-driven language and toolchain focused on explicit computational layers, including runtime, compiler, system, inspection, kernel, machine, primitive hardware and basal/root semantics.
@@ -17,7 +21,7 @@ This extension brings nC source files into Visual Studio Code with syntax highli
 Release-grade editor surface includes:
 
 - Systems Spectrum highlighting for basal/root, primitive, machine and kernel lanes.
-- Product version `1.0.0.21v` with VS Code SemVer package version `1.0.0-21v`.
+- Product version `1.0.0.22v` with VS Code SemVer package version `1.0.0-22v`.
 - Professional IDE parity tier comparable to mature C/C++/Rust/Java plugins.
 - Polyglot Systems text colors based on Java amber/steel, Python blue/yellow, C standard blue,
   C++ core/light blue and Rust copper/hazard.
@@ -110,7 +114,7 @@ Documented only; do not execute in this phase:
 ```bash
 npx @vscode/vsce login <publisher>
 npx @vscode/vsce publish
-npx ovsx publish dist/nc-language-1.0.0-21v.vsix
+npx ovsx publish dist/nc-language-1.0.0-22v.vsix
 ```
 
 Do not run publish commands unless explicitly authorized by the project owner.
