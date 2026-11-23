@@ -129,8 +129,8 @@ class Session {
   }
   stop() {
     if(this.closed)return;
-    this.closed=true;
     try{this.send('shutdown',undefined,2);this.send('exit');}catch{}
+    this.closed=true;
     try{this.process.kill();}catch{}
   }
 }
