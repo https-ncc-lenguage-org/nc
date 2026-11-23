@@ -24,14 +24,25 @@ internal object NcLspCommands {
 
     private fun tool(override: String, name: String): String {
         env(override)?.let { return it }
+        val directories = mutableListOf<Path>()
         val ncc = runCatching { NcToolchainResolver.resolveNccBinary().path }.getOrNull()
         if (!ncc.isNullOrBlank()) {
-            val parent = runCatching { Path.of(ncc).parent }.getOrNull()
-            if (parent != null) {
-                val executable = if (SystemInfo.isWindows) "$name.exe" else name
-                val path = parent.resolve(executable)
-                if (Files.isRegularFile(path)) return path.toString()
+            runCatching { Path.of(ncc).parent }.getOrNull()?.let { directories.add(it) }
+        }
+        if (SystemInfo.isWindows) {
+            env("LOCALAPPDATA")?.let { directories.add(Path.of(it, "nC", "bin")) }
+            env("USERPROFILE")?.let { directories.add(Path.of(it, "AppData", "Local", "nC", "bin")) }
+        } else {
+            System.getProperty("user.home")?.let {
+                directories.add(Path.of(it, ".local", "bin"))
+                directories.add(Path.of(it, ".cargo", "bin"))
             }
+            directories.add(Path.of("/usr/local/bin"))
+        }
+        val executable = if (SystemInfo.isWindows) "$name.exe" else name
+        for (directory in directories.distinct()) {
+            val candidate = directory.resolve(executable)
+            if (Files.isRegularFile(candidate)) return candidate.toString()
         }
         return name
     }
