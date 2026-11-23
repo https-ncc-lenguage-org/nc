@@ -37,4 +37,10 @@ class ContractTests(unittest.TestCase):
         self.assertIn('"nc-sys-lsp"', commands)
         self.assertIn('"lsp"', commands)
 
+    def test_lsp_uses_installed_windows_suite_without_ncup(self):
+        commands = (ROOT/'src/main/kotlin/dev/nc/jetbrains/NcLspCommands.kt').read_text()
+        for marker in ('NC_NCLSP_BIN', 'NC_SYS_LSP_BIN', 'LOCALAPPDATA',
+                       'USERPROFILE', 'Path.of(it, "nC", "bin")'):
+            self.assertIn(marker, commands)
+
 if __name__ == '__main__': unittest.main()
