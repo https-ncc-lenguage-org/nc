@@ -1,0 +1,280 @@
+{
+  "helloWorld": {
+    "prefix": "helloWorld",
+    "description": "nC snippet: helloWorld",
+    "body": [
+      "use <io:output>;",
+      "helloWorld {",
+      "    fn:",
+      "        run() -> int {",
+      "            println(\"Hola nC\");",
+      "            return 0;",
+      "        }",
+      "    ref main ->> run;",
+      "}"
+    ]
+  },
+  "runtimeInputOutput": {
+    "prefix": "runtimeInputOutput",
+    "description": "nC snippet: runtimeInputOutput",
+    "body": [
+      "use <io:input, output, render>;",
+      "runtimeInputOutput {",
+      "    fn:",
+      "        run() -> int {",
+      "            value >> int <- 0;",
+      "            value <- readInt();",
+      "            println(renderInt(value));",
+      "            return 0;",
+      "        }",
+      "    ref main ->> run;",
+      "}"
+    ]
+  },
+  "ifElse": {
+    "prefix": "ifElse",
+    "description": "nC snippet: ifElse",
+    "body": [
+      "if (${1:condition}) {",
+      "    ${2}",
+      "} else {",
+      "    ${3}",
+      "}"
+    ]
+  },
+  "matchGuardUnless": {
+    "prefix": "matchGuardUnless",
+    "description": "nC snippet: matchGuardUnless",
+    "body": [
+      "match (${1:value}) {",
+      "    ${2}",
+      "}"
+    ]
+  },
+  "memRegion": {
+    "prefix": "memRegion",
+    "description": "nC snippet: memRegion",
+    "body": [
+      "region >> memRegion<byte> <- ${1:source};"
+    ]
+  },
+  "siteAddr": {
+    "prefix": "siteAddr",
+    "description": "nC snippet: siteAddr",
+    "body": [
+      "site >> site<byte> <- ${1:address};"
+    ]
+  },
+  "primitiveHardwareIdentityUart": {
+    "prefix": "primitiveHardwareIdentityUart",
+    "description": "nC snippet: primitiveHardwareIdentityUart",
+    "body": [
+      "uart[@hardware] {",
+      "    target:",
+      "        arch: x86_64;",
+      "}"
+    ]
+  },
+  "compilerReportSkeleton": {
+    "prefix": "compilerReportSkeleton",
+    "description": "nC snippet: compilerReportSkeleton",
+    "body": [
+      "report[@compiler] {",
+      "    fn:",
+      "        run() -> bool {",
+      "            return true;",
+      "        }",
+      "}"
+    ]
+  },
+  "ffiCSkeleton": {
+    "prefix": "ffiCSkeleton",
+    "description": "nC snippet: ffiCSkeleton",
+    "body": [
+      "use <ffi:external>;",
+      "ffiBridge {",
+      "    fn:",
+      "        run() -> int {",
+      "            return 0;",
+      "        }",
+      "}"
+    ]
+  },
+  "ffiPointerContract": {
+    "prefix": "ffiPointerContract",
+    "description": "nC snippet: ffiPointerContract",
+    "body": [
+      "address >> ptr<byte> <- ${1:source};"
+    ]
+  },
+  "pointerFfiContractFull": {
+    "prefix": "pointerFfiContractFull",
+    "description": "nC snippet: pointerFfiContractFull",
+    "body": [
+      "address >> ptr<byte> <- ${1:source};",
+      "if (address != null) {",
+      "    ${2}",
+      "}"
+    ]
+  },
+  "pointerRegionFromPtr": {
+    "prefix": "pointerRegionFromPtr",
+    "description": "nC snippet: pointerRegionFromPtr",
+    "body": [
+      "region >> memRegion<byte> <- ${1:pointer};"
+    ]
+  },
+  "ptrNullable": {
+    "prefix": "ptrNullable",
+    "description": "nC snippet: ptrNullable",
+    "body": [
+      "value >> ptr<byte> <- null;"
+    ]
+  },
+  "refMutable": {
+    "prefix": "refMutable",
+    "description": "nC snippet: refMutable",
+    "body": [
+      "value >> ref<byte> <- ${1:source};"
+    ]
+  },
+  "riskRawPointer": {
+    "prefix": "riskRawPointer",
+    "description": "nC snippet: riskRawPointer",
+    "body": [
+      "// Review raw pointer bounds and ownership before access.",
+      "ptr >> ptr<byte> <- ${1:source};"
+    ]
+  },
+  "importRuntimeInput": {
+    "prefix": "importRuntimeInput",
+    "description": "nC snippet: importRuntimeInput",
+    "body": [
+      "use <io:input>;"
+    ]
+  },
+  "importRuntimeOutput": {
+    "prefix": "importRuntimeOutput",
+    "description": "nC snippet: importRuntimeOutput",
+    "body": [
+      "use <io:output, render>;"
+    ]
+  },
+  "importStoudRichOutput": {
+    "prefix": "importStoudRichOutput",
+    "description": "nC snippet: importStoudRichOutput",
+    "body": [
+      "use stoud.io { output, render };"
+    ]
+  },
+  "printColorBold": {
+    "prefix": "printColorBold",
+    "description": "nC snippet: printColorBold",
+    "body": [
+      "println(${1:text});"
+    ]
+  },
+  "printSeparator": {
+    "prefix": "printSeparator",
+    "description": "nC snippet: printSeparator",
+    "body": [
+      "println(\"----------------\");"
+    ]
+  },
+  "printNewlineEscape": {
+    "prefix": "printNewlineEscape",
+    "description": "nC snippet: printNewlineEscape",
+    "body": [
+      "println(\"\\n\");"
+    ]
+  },
+  "printLiteralEscapes": {
+    "prefix": "printLiteralEscapes",
+    "description": "nC snippet: printLiteralEscapes",
+    "body": [
+      "println(\"Linea 1\\nLinea 2\");"
+    ]
+  },
+  "importRuntimeRegion": {
+    "prefix": "importRuntimeRegion",
+    "description": "nC snippet: importRuntimeRegion",
+    "body": [
+      "use <memory:region>;"
+    ]
+  },
+  "importRuntimePtr": {
+    "prefix": "importRuntimePtr",
+    "description": "nC snippet: importRuntimePtr",
+    "body": [
+      "use <memory:ptr, heap>;"
+    ]
+  },
+  "compactIntDeclaration": {
+    "prefix": "compactIntDeclaration",
+    "description": "nC snippet: compactIntDeclaration",
+    "body": [
+      "${1:contador} >> int <- ${2:0};"
+    ]
+  },
+  "compactBoolDeclaration": {
+    "prefix": "compactBoolDeclaration",
+    "description": "nC snippet: compactBoolDeclaration",
+    "body": [
+      "${1:activo} >> bool <- ${2:true};"
+    ]
+  },
+  "compactAddAssign": {
+    "prefix": "compactAddAssign",
+    "description": "nC snippet: compactAddAssign",
+    "body": [
+      "${1:x} += ${2:1};"
+    ]
+  },
+  "compactIncrement": {
+    "prefix": "compactIncrement",
+    "description": "nC snippet: compactIncrement",
+    "body": [
+      "${1:i}++;"
+    ]
+  },
+  "basalRoutineRawReport": {
+    "prefix": "basalRoutineRawReport",
+    "description": "nC snippet: basalRoutineRawReport",
+    "body": [
+      "basalReport[@] {",
+      "    fn:",
+      "        run() -> bool {",
+      "            return true;",
+      "        }",
+      "}"
+    ]
+  },
+  "destructureSkeleton": {
+    "prefix": "destructureSkeleton",
+    "description": "nC snippet: destructureSkeleton",
+    "body": [
+      "destructure(${1:value});"
+    ]
+  },
+  "constructureSkeleton": {
+    "prefix": "constructureSkeleton",
+    "description": "nC snippet: constructureSkeleton",
+    "body": [
+      "constructure(${1:value});"
+    ]
+  },
+  "copySkeleton": {
+    "prefix": "copySkeleton",
+    "description": "nC snippet: copySkeleton",
+    "body": [
+      "copia >> ${1:type} <- copy(${2:value});"
+    ]
+  },
+  "cloneSkeleton": {
+    "prefix": "cloneSkeleton",
+    "description": "nC snippet: cloneSkeleton",
+    "body": [
+      "clon >> ${1:type} <- clone(${2:value});"
+    ]
+  }
+}
