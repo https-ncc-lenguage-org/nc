@@ -32,10 +32,17 @@ Choose your shell and copy the whole command. It checks the host kernel and proc
     if ([Environment]::OSVersion.Platform -ne 'Win32NT' -or [Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE','Machine') -ne 'AMD64') { throw 'Requires Windows x86-64.' }
     $url = 'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-windows-x86_64-user.msi'
     $sha = '7c914937b390101882b32c6379f96f8df78e765f5e8960685cf1f0008dc901ef'
-    $msi = Join-Path ([IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString() + '.msi')
+    $cache = [IO.Directory]::CreateDirectory((Join-Path $env:LOCALAPPDATA 'nC\packages')).FullName
+    $msi = Join-Path $cache ([IO.Path]::GetFileName(([Uri]$url).AbsolutePath))
+    $part = $msi + '.' + [Guid]::NewGuid().ToString('N') + '.part'
+    $verify = { param($file) $h = [Security.Cryptography.SHA256]::Create(); try { if ([BitConverter]::ToString($h.ComputeHash([IO.File]::ReadAllBytes($file))).Replace('-','') -ne $sha) { throw 'SHA-256 mismatch.' } } finally { $h.Dispose() } }
     try {
-        Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $msi
-        if ((Get-FileHash -LiteralPath $msi -Algorithm SHA256).Hash -ne $sha) { throw 'SHA-256 mismatch.' }
+        if (-not [IO.File]::Exists($msi)) {
+            Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $part
+            & $verify $part
+            try { [IO.File]::Move($part,$msi) } catch [IO.IOException] { if (-not [IO.File]::Exists($msi)) { throw } }
+        }
+        & $verify $msi
         $argsMsi = '/i ' + [char]34 + $msi + [char]34 + ' /qn /norestart'
         $result = Start-Process -FilePath (Join-Path ([Environment]::SystemDirectory) 'msiexec.exe') -ArgumentList $argsMsi -Wait -PassThru
         if ($result.ExitCode -ne 0) { throw ('Windows Installer returned ' + $result.ExitCode) }
@@ -44,7 +51,7 @@ Choose your shell and copy the whole command. It checks the host kernel and proc
         & (Join-Path $bin 'ncc.exe') self-test
         if ($LASTEXITCODE -ne 0) { throw 'ncc self-test failed.' }
     } finally {
-        if (Test-Path -LiteralPath $msi) { Remove-Item -LiteralPath $msi }
+        if ([IO.File]::Exists($part)) { [IO.File]::Delete($part) }
     }
 }
 ```
@@ -56,7 +63,7 @@ Choose your shell and copy the whole command. It checks the host kernel and proc
 
 <!-- install:compiler:cmd -->
 ```batch
-powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference = 'Stop'; if ([Environment]::OSVersion.Platform -ne 'Win32NT' -or [Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE','Machine') -ne 'AMD64') { throw 'Requires Windows x86-64.' }; $url = 'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-windows-x86_64-user.msi'; $sha = '7c914937b390101882b32c6379f96f8df78e765f5e8960685cf1f0008dc901ef'; $msi = Join-Path ([IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString() + '.msi'); try { Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $msi; if ((Get-FileHash -LiteralPath $msi -Algorithm SHA256).Hash -ne $sha) { throw 'SHA-256 mismatch.' }; $argsMsi = '/i ' + [char]34 + $msi + [char]34 + ' /qn /norestart'; $result = Start-Process -FilePath (Join-Path ([Environment]::SystemDirectory) 'msiexec.exe') -ArgumentList $argsMsi -Wait -PassThru; if ($result.ExitCode -ne 0) { throw ('Windows Installer returned ' + $result.ExitCode) }; $bin = Join-Path $env:LOCALAPPDATA 'nC\toolchains\windows-x86_64\bin'; $env:PATH = $bin + [IO.Path]::PathSeparator + $env:PATH; & (Join-Path $bin 'ncc.exe') self-test; if ($LASTEXITCODE -ne 0) { throw 'ncc self-test failed.' } } finally { if (Test-Path -LiteralPath $msi) { Remove-Item -LiteralPath $msi } }" && set "PATH=%LOCALAPPDATA%\nC\toolchains\windows-x86_64\bin;%PATH%"
+powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference = 'Stop'; if ([Environment]::OSVersion.Platform -ne 'Win32NT' -or [Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE','Machine') -ne 'AMD64') { throw 'Requires Windows x86-64.' }; $url = 'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-windows-x86_64-user.msi'; $sha = '7c914937b390101882b32c6379f96f8df78e765f5e8960685cf1f0008dc901ef'; $cache = [IO.Directory]::CreateDirectory((Join-Path $env:LOCALAPPDATA 'nC\packages')).FullName; $msi = Join-Path $cache ([IO.Path]::GetFileName(([Uri]$url).AbsolutePath)); $part = $msi + '.' + [Guid]::NewGuid().ToString('N') + '.part'; $verify = { param($file) $h = [Security.Cryptography.SHA256]::Create(); try { if ([BitConverter]::ToString($h.ComputeHash([IO.File]::ReadAllBytes($file))).Replace('-','') -ne $sha) { throw 'SHA-256 mismatch.' } } finally { $h.Dispose() } }; try { if (-not [IO.File]::Exists($msi)) {     Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $part;     & $verify $part;     try { [IO.File]::Move($part,$msi) } catch [IO.IOException] { if (-not [IO.File]::Exists($msi)) { throw } } }; & $verify $msi; $argsMsi = '/i ' + [char]34 + $msi + [char]34 + ' /qn /norestart'; $result = Start-Process -FilePath (Join-Path ([Environment]::SystemDirectory) 'msiexec.exe') -ArgumentList $argsMsi -Wait -PassThru; if ($result.ExitCode -ne 0) { throw ('Windows Installer returned ' + $result.ExitCode) }; $bin = Join-Path $env:LOCALAPPDATA 'nC\toolchains\windows-x86_64\bin'; $env:PATH = $bin + [IO.Path]::PathSeparator + $env:PATH; & (Join-Path $bin 'ncc.exe') self-test; if ($LASTEXITCODE -ne 0) { throw 'ncc self-test failed.' } } finally { if ([IO.File]::Exists($part)) { [IO.File]::Delete($part) } }" && set "PATH=%LOCALAPPDATA%\nC\toolchains\windows-x86_64\bin;%PATH%"
 ```
 
 </details>
@@ -89,7 +96,7 @@ export PATH="$HOME/.local/bin:$PATH"
     [ "$(readlink -- "$bin/ncc")" = "$dest/ncc" ] || { echo "Another ncc already occupies $bin/ncc." >&2; exit 1; }
   fi
   [ ! -L "$dest" ] || { echo "The installation directory is a symlink." >&2; exit 1; }
-  mv -Tn -- "$stage/files" "$dest"
+  if [ ! -d "$dest" ]; then mv -Tn -- "$stage/files" "$dest" || [ -d "$dest" ]; fi
   if [ -d "$stage/files" ]; then diff -qr -- "$stage/files" "$dest"; fi
   ln -sT -- "$dest/ncc" "$bin/ncc" 2>/dev/null || [ "$(readlink -- "$bin/ncc")" = "$dest/ncc" ]
   profile="$HOME/.profile"
@@ -120,16 +127,23 @@ The freestanding x86-64 BIOS mini kernel is a separate package. It contains the 
     if ([Environment]::OSVersion.Platform -ne 'Win32NT' -or [Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE','Machine') -ne 'AMD64') { throw 'Requires Windows x86-64.' }
     $url = 'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/nc-kernel-mini-20260822-x86_64-bios-user.msi'
     $sha = '188b4ee519043f6db179a0146eabe43b61a45f0d18b58aefd78033a9e5bf9780'
-    $msi = Join-Path ([IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString() + '.msi')
+    $cache = [IO.Directory]::CreateDirectory((Join-Path $env:LOCALAPPDATA 'nC\packages')).FullName
+    $msi = Join-Path $cache ([IO.Path]::GetFileName(([Uri]$url).AbsolutePath))
+    $part = $msi + '.' + [Guid]::NewGuid().ToString('N') + '.part'
+    $verify = { param($file) $h = [Security.Cryptography.SHA256]::Create(); try { if ([BitConverter]::ToString($h.ComputeHash([IO.File]::ReadAllBytes($file))).Replace('-','') -ne $sha) { throw 'SHA-256 mismatch.' } } finally { $h.Dispose() } }
     try {
-        Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $msi
-        if ((Get-FileHash -LiteralPath $msi -Algorithm SHA256).Hash -ne $sha) { throw 'SHA-256 mismatch.' }
+        if (-not [IO.File]::Exists($msi)) {
+            Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $part
+            & $verify $part
+            try { [IO.File]::Move($part,$msi) } catch [IO.IOException] { if (-not [IO.File]::Exists($msi)) { throw } }
+        }
+        & $verify $msi
         $argsMsi = '/i ' + [char]34 + $msi + [char]34 + ' /qn /norestart'
         $result = Start-Process -FilePath (Join-Path ([Environment]::SystemDirectory) 'msiexec.exe') -ArgumentList $argsMsi -Wait -PassThru
         if ($result.ExitCode -ne 0) { throw ('Windows Installer returned ' + $result.ExitCode) }
         Write-Output (Join-Path $env:LOCALAPPDATA 'nC\kernels\x86_64-unknown-none\mini-bios-20260822')
     } finally {
-        if (Test-Path -LiteralPath $msi) { Remove-Item -LiteralPath $msi }
+        if ([IO.File]::Exists($part)) { [IO.File]::Delete($part) }
     }
 }
 ```
@@ -141,7 +155,7 @@ The freestanding x86-64 BIOS mini kernel is a separate package. It contains the 
 
 <!-- install:kernel:cmd -->
 ```batch
-powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference = 'Stop'; if ([Environment]::OSVersion.Platform -ne 'Win32NT' -or [Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE','Machine') -ne 'AMD64') { throw 'Requires Windows x86-64.' }; $url = 'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/nc-kernel-mini-20260822-x86_64-bios-user.msi'; $sha = '188b4ee519043f6db179a0146eabe43b61a45f0d18b58aefd78033a9e5bf9780'; $msi = Join-Path ([IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString() + '.msi'); try { Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $msi; if ((Get-FileHash -LiteralPath $msi -Algorithm SHA256).Hash -ne $sha) { throw 'SHA-256 mismatch.' }; $argsMsi = '/i ' + [char]34 + $msi + [char]34 + ' /qn /norestart'; $result = Start-Process -FilePath (Join-Path ([Environment]::SystemDirectory) 'msiexec.exe') -ArgumentList $argsMsi -Wait -PassThru; if ($result.ExitCode -ne 0) { throw ('Windows Installer returned ' + $result.ExitCode) }; Write-Output (Join-Path $env:LOCALAPPDATA 'nC\kernels\x86_64-unknown-none\mini-bios-20260822') } finally { if (Test-Path -LiteralPath $msi) { Remove-Item -LiteralPath $msi } }"
+powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference = 'Stop'; if ([Environment]::OSVersion.Platform -ne 'Win32NT' -or [Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE','Machine') -ne 'AMD64') { throw 'Requires Windows x86-64.' }; $url = 'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/nc-kernel-mini-20260822-x86_64-bios-user.msi'; $sha = '188b4ee519043f6db179a0146eabe43b61a45f0d18b58aefd78033a9e5bf9780'; $cache = [IO.Directory]::CreateDirectory((Join-Path $env:LOCALAPPDATA 'nC\packages')).FullName; $msi = Join-Path $cache ([IO.Path]::GetFileName(([Uri]$url).AbsolutePath)); $part = $msi + '.' + [Guid]::NewGuid().ToString('N') + '.part'; $verify = { param($file) $h = [Security.Cryptography.SHA256]::Create(); try { if ([BitConverter]::ToString($h.ComputeHash([IO.File]::ReadAllBytes($file))).Replace('-','') -ne $sha) { throw 'SHA-256 mismatch.' } } finally { $h.Dispose() } }; try { if (-not [IO.File]::Exists($msi)) {     Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $part;     & $verify $part;     try { [IO.File]::Move($part,$msi) } catch [IO.IOException] { if (-not [IO.File]::Exists($msi)) { throw } } }; & $verify $msi; $argsMsi = '/i ' + [char]34 + $msi + [char]34 + ' /qn /norestart'; $result = Start-Process -FilePath (Join-Path ([Environment]::SystemDirectory) 'msiexec.exe') -ArgumentList $argsMsi -Wait -PassThru; if ($result.ExitCode -ne 0) { throw ('Windows Installer returned ' + $result.ExitCode) }; Write-Output (Join-Path $env:LOCALAPPDATA 'nC\kernels\x86_64-unknown-none\mini-bios-20260822') } finally { if ([IO.File]::Exists($part)) { [IO.File]::Delete($part) } }"
 ```
 
 </details>
@@ -167,7 +181,7 @@ powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference = 'St
   mkdir -- "$stage/files"
   tar -xzf "$stage/package" -C "$stage/files"
   [ ! -L "$dest" ] || { echo "The installation directory is a symlink." >&2; exit 1; }
-  mv -Tn -- "$stage/files" "$dest"
+  if [ ! -d "$dest" ]; then mv -Tn -- "$stage/files" "$dest" || [ -d "$dest" ]; fi
   if [ -d "$stage/files" ]; then diff -qr -- "$stage/files" "$dest"; fi
   printf 'Installed the nC mini kernel in %s\n' "$dest"
 )

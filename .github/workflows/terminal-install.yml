@@ -71,7 +71,7 @@ jobs:
           }
 
           if ($IsWindows) {
-            $bin = Join-Path $env:LOCALAPPDATA 'nC/toolchains/windows-x86_64/bin'
+            $bin = [IO.Path]::GetFullPath((Join-Path $env:LOCALAPPDATA 'nC/toolchains/windows-x86_64/bin'))
             $kernel = Join-Path $env:LOCALAPPDATA 'nC/kernels/x86_64-unknown-none/mini-bios-20260822'
             $compilerName = 'ncc.exe'
             $provider = 'ncruntime.dll'
@@ -129,3 +129,9 @@ jobs:
             $remaining = @([Environment]::GetEnvironmentVariable('Path','User') -split ';' | ForEach-Object { $_.TrimEnd('\') })
             if ($remaining -contains $bin) { throw 'MSI uninstall left its PATH entry.' }
           }
+      - name: Read the Windows Installer event after a failure
+        if: failure() && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Get-WinEvent -FilterHashtable @{LogName='Application';ProviderName='MsiInstaller';StartTime=(Get-Date).AddMinutes(-10)} -ErrorAction SilentlyContinue |
+            Select-Object -First 12 -ExpandProperty Message
