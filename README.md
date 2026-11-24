@@ -18,6 +18,163 @@ Each package contains `ncc`, its runtime library and the license notices. Extrac
 
 [**nC language**](https://ncc-lenguage.org/nc-programming-language) · [**ncc compiler**](https://ncc-lenguage.org/ncc-compiler) · [**Documentation**](https://ncc-lenguage.org/library) · [**Native downloads**](https://github.com/https-ncc-lenguage-org/nc/releases/tag/v0.1.0-bootstrap.168.r4) · [**Language guide**](docs/public/origen-y-guia.md) · [**Architecture**](docs/public/arquitectura-y-bootstrap.md) · [**Contribute**](CONTRIBUTING.md)
 
+## Install from the terminal
+
+Choose your shell and copy the whole command. It checks the host kernel and processor, verifies the package SHA-256 and installs V168 R4 for your user. Windows uses `%LOCALAPPDATA%\nC\toolchains\windows-x86_64\bin`. Linux uses `${XDG_DATA_HOME:-$HOME/.local/share}/nC/toolchains/linux-x86_64/V168-R4` and exposes `ncc` in `~/.local/bin`. Linux requires glibc 2.34 or later.
+
+<details>
+<summary>Windows · PowerShell</summary>
+
+<!-- install:compiler:powershell -->
+```powershell
+& {
+    $ErrorActionPreference = 'Stop'
+    if ([Environment]::OSVersion.Platform -ne 'Win32NT' -or [Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE','Machine') -ne 'AMD64') { throw 'Requires Windows x86-64.' }
+    $url = 'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-windows-x86_64-user.msi'
+    $sha = '7c914937b390101882b32c6379f96f8df78e765f5e8960685cf1f0008dc901ef'
+    $msi = Join-Path ([IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString() + '.msi')
+    try {
+        Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $msi
+        if ((Get-FileHash -LiteralPath $msi -Algorithm SHA256).Hash -ne $sha) { throw 'SHA-256 mismatch.' }
+        $argsMsi = '/i ' + [char]34 + $msi + [char]34 + ' /qn /norestart'
+        $result = Start-Process -FilePath (Join-Path ([Environment]::SystemDirectory) 'msiexec.exe') -ArgumentList $argsMsi -Wait -PassThru
+        if ($result.ExitCode -ne 0) { throw ('Windows Installer returned ' + $result.ExitCode) }
+        $bin = Join-Path $env:LOCALAPPDATA 'nC\toolchains\windows-x86_64\bin'
+        $env:PATH = $bin + [IO.Path]::PathSeparator + $env:PATH
+        & (Join-Path $bin 'ncc.exe') self-test
+        if ($LASTEXITCODE -ne 0) { throw 'ncc self-test failed.' }
+    } finally {
+        if (Test-Path -LiteralPath $msi) { Remove-Item -LiteralPath $msi }
+    }
+}
+```
+
+</details>
+
+<details>
+<summary>Windows · Command Prompt (CMD)</summary>
+
+<!-- install:compiler:cmd -->
+```batch
+powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference = 'Stop'; if ([Environment]::OSVersion.Platform -ne 'Win32NT' -or [Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE','Machine') -ne 'AMD64') { throw 'Requires Windows x86-64.' }; $url = 'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-windows-x86_64-user.msi'; $sha = '7c914937b390101882b32c6379f96f8df78e765f5e8960685cf1f0008dc901ef'; $msi = Join-Path ([IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString() + '.msi'); try { Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $msi; if ((Get-FileHash -LiteralPath $msi -Algorithm SHA256).Hash -ne $sha) { throw 'SHA-256 mismatch.' }; $argsMsi = '/i ' + [char]34 + $msi + [char]34 + ' /qn /norestart'; $result = Start-Process -FilePath (Join-Path ([Environment]::SystemDirectory) 'msiexec.exe') -ArgumentList $argsMsi -Wait -PassThru; if ($result.ExitCode -ne 0) { throw ('Windows Installer returned ' + $result.ExitCode) }; $bin = Join-Path $env:LOCALAPPDATA 'nC\toolchains\windows-x86_64\bin'; $env:PATH = $bin + [IO.Path]::PathSeparator + $env:PATH; & (Join-Path $bin 'ncc.exe') self-test; if ($LASTEXITCODE -ne 0) { throw 'ncc self-test failed.' } } finally { if (Test-Path -LiteralPath $msi) { Remove-Item -LiteralPath $msi } }" && set "PATH=%LOCALAPPDATA%\nC\toolchains\windows-x86_64\bin;%PATH%"
+```
+
+</details>
+
+<details>
+<summary>Linux, Ubuntu and WSL · Bash</summary>
+
+<!-- install:compiler:bash -->
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+(
+  set -eu
+  [ "$(uname -s)/$(uname -m)" = Linux/x86_64 ] || { echo "Requires Linux x86-64." >&2; exit 1; }
+  data=${XDG_DATA_HOME:-"$HOME/.local/share"}
+  case "$data" in /*) ;; *) data="$HOME/.local/share" ;; esac
+  parent="$data/nC/toolchains/linux-x86_64"
+  dest="$parent/V168-R4"
+  mkdir -p -- "$parent"
+  stage=$(mktemp -d -- "$parent/.install.XXXXXXXX")
+  trap 'rm -rf -- "$stage"' EXIT
+  curl --fail --silent --show-error --location --proto '=https' \
+    'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-linux-x86_64.tar.gz' -o "$stage/package"
+  (cd "$stage" && printf '%s  package\n' 'dafd079e3d554f340f13a1e125be1674cc98032b0b4d78391c9923af92da3a64' | sha256sum --check --status)
+  mkdir -- "$stage/files"
+  tar -xzf "$stage/package" -C "$stage/files"
+  "$stage/files/ncc" self-test
+  bin="$HOME/.local/bin"
+  mkdir -p -- "$bin"
+  if [ -e "$bin/ncc" ] || [ -L "$bin/ncc" ]; then
+    [ "$(readlink -- "$bin/ncc")" = "$dest/ncc" ] || { echo "Another ncc already occupies $bin/ncc." >&2; exit 1; }
+  fi
+  [ ! -L "$dest" ] || { echo "The installation directory is a symlink." >&2; exit 1; }
+  mv -Tn -- "$stage/files" "$dest"
+  if [ -d "$stage/files" ]; then diff -qr -- "$stage/files" "$dest"; fi
+  ln -sT -- "$dest/ncc" "$bin/ncc" 2>/dev/null || [ "$(readlink -- "$bin/ncc")" = "$dest/ncc" ]
+  profile="$HOME/.profile"
+  for file in "$HOME/.bash_profile" "$HOME/.bash_login"; do
+    if [ -f "$file" ]; then profile=$file; break; fi
+  done
+  line='case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac'
+  if ! grep -Fqx -- "$line" "$profile" 2>/dev/null; then printf '\n%s\n' "$line" >> "$profile"; fi
+  "$bin/ncc" self-test
+)
+```
+
+</details>
+
+Run `ncc self-test` to check the installation. The command updates the current shell and configures the user PATH for new sessions. [Installation and removal](docs/install.md#terminal-installation) · [Download the Windows per-user MSI](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-windows-x86_64-user.msi)
+
+### Optional nC kernel
+
+The freestanding x86-64 BIOS mini kernel is a separate package. It contains the boot image, the ELF and the matching nC source from 22 August 2026. Installing it copies files into your user profile. To boot it in QEMU, follow the included README. [Kernel guide](tools/distribution/packages/kernel-mini.md) · [Windows MSI](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/nc-kernel-mini-20260822-x86_64-bios-user.msi) · [Image archive](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/nc-kernel-mini-20260822-x86_64-bios.tar.gz)
+
+<details>
+<summary>Windows · PowerShell</summary>
+
+<!-- install:kernel:powershell -->
+```powershell
+& {
+    $ErrorActionPreference = 'Stop'
+    if ([Environment]::OSVersion.Platform -ne 'Win32NT' -or [Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE','Machine') -ne 'AMD64') { throw 'Requires Windows x86-64.' }
+    $url = 'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/nc-kernel-mini-20260822-x86_64-bios-user.msi'
+    $sha = '188b4ee519043f6db179a0146eabe43b61a45f0d18b58aefd78033a9e5bf9780'
+    $msi = Join-Path ([IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString() + '.msi')
+    try {
+        Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $msi
+        if ((Get-FileHash -LiteralPath $msi -Algorithm SHA256).Hash -ne $sha) { throw 'SHA-256 mismatch.' }
+        $argsMsi = '/i ' + [char]34 + $msi + [char]34 + ' /qn /norestart'
+        $result = Start-Process -FilePath (Join-Path ([Environment]::SystemDirectory) 'msiexec.exe') -ArgumentList $argsMsi -Wait -PassThru
+        if ($result.ExitCode -ne 0) { throw ('Windows Installer returned ' + $result.ExitCode) }
+        Write-Output (Join-Path $env:LOCALAPPDATA 'nC\kernels\x86_64-unknown-none\mini-bios-20260822')
+    } finally {
+        if (Test-Path -LiteralPath $msi) { Remove-Item -LiteralPath $msi }
+    }
+}
+```
+
+</details>
+
+<details>
+<summary>Windows · Command Prompt (CMD)</summary>
+
+<!-- install:kernel:cmd -->
+```batch
+powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference = 'Stop'; if ([Environment]::OSVersion.Platform -ne 'Win32NT' -or [Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE','Machine') -ne 'AMD64') { throw 'Requires Windows x86-64.' }; $url = 'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/nc-kernel-mini-20260822-x86_64-bios-user.msi'; $sha = '188b4ee519043f6db179a0146eabe43b61a45f0d18b58aefd78033a9e5bf9780'; $msi = Join-Path ([IO.Path]::GetTempPath()) ([Guid]::NewGuid().ToString() + '.msi'); try { Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $msi; if ((Get-FileHash -LiteralPath $msi -Algorithm SHA256).Hash -ne $sha) { throw 'SHA-256 mismatch.' }; $argsMsi = '/i ' + [char]34 + $msi + [char]34 + ' /qn /norestart'; $result = Start-Process -FilePath (Join-Path ([Environment]::SystemDirectory) 'msiexec.exe') -ArgumentList $argsMsi -Wait -PassThru; if ($result.ExitCode -ne 0) { throw ('Windows Installer returned ' + $result.ExitCode) }; Write-Output (Join-Path $env:LOCALAPPDATA 'nC\kernels\x86_64-unknown-none\mini-bios-20260822') } finally { if (Test-Path -LiteralPath $msi) { Remove-Item -LiteralPath $msi } }"
+```
+
+</details>
+
+<details>
+<summary>Linux, Ubuntu and WSL · Bash</summary>
+
+<!-- install:kernel:bash -->
+```bash
+(
+  set -eu
+  [ "$(uname -s)/$(uname -m)" = Linux/x86_64 ] || { echo "Requires Linux x86-64." >&2; exit 1; }
+  data=${XDG_DATA_HOME:-"$HOME/.local/share"}
+  case "$data" in /*) ;; *) data="$HOME/.local/share" ;; esac
+  parent="$data/nC/kernels/x86_64-unknown-none"
+  dest="$parent/mini-bios-20260822"
+  mkdir -p -- "$parent"
+  stage=$(mktemp -d -- "$parent/.install.XXXXXXXX")
+  trap 'rm -rf -- "$stage"' EXIT
+  curl --fail --silent --show-error --location --proto '=https' \
+    'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/nc-kernel-mini-20260822-x86_64-bios.tar.gz' -o "$stage/package"
+  (cd "$stage" && printf '%s  package\n' 'aac52831dbd6628f040024288583766df9f255fda4fc759e650ca7efae87bd26' | sha256sum --check --status)
+  mkdir -- "$stage/files"
+  tar -xzf "$stage/package" -C "$stage/files"
+  [ ! -L "$dest" ] || { echo "The installation directory is a symlink." >&2; exit 1; }
+  mv -Tn -- "$stage/files" "$dest"
+  if [ -d "$stage/files" ]; then diff -qr -- "$stage/files" "$dest"; fi
+  printf 'Installed the nC mini kernel in %s\n' "$dest"
+)
+```
+
+</details>
+
 ## Why it exists
 
 Layout, alignment, address validity and calling conventions affect observable program behavior. nC addresses these decisions within one semantic model. The root `[@]`, `[@machine]`, `primitive[@]`, runtime and linker participate in that contract.

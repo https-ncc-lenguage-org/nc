@@ -1,0 +1,131 @@
+name: Install from the published terminal commands
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'README.md'
+      - 'docs/public/terminal-install.json'
+      - 'tools/distribution/packages/**'
+      - '.github/workflows/terminal-install.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'README.md'
+      - 'docs/public/terminal-install.json'
+      - 'tools/distribution/packages/**'
+      - '.github/workflows/terminal-install.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    name: Install, run and reinstall (${{ matrix.terminal }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { terminal: powershell, runner: windows-latest }
+          - { terminal: cmd, runner: windows-latest }
+          - { terminal: bash, runner: ubuntu-24.04 }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Exercise the commands copied from the README
+        shell: pwsh
+        env:
+          INSTALL_SHELL: ${{ matrix.terminal }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $docs = [IO.File]::ReadAllText((Resolve-Path README.md)).Replace("`r`n", "`n")
+          $meta = Get-Content docs/public/terminal-install.json -Raw | ConvertFrom-Json
+          $hello = (Resolve-Path 'examples/00_hello/hello.n').Path
+          $work = (New-Item -ItemType Directory -Path (Join-Path $env:RUNNER_TEMP 'installed ncc check')).FullName
+          $shellName = $env:INSTALL_SHELL
+          $env:LD_LIBRARY_PATH = $null
+          $env:LD_PRELOAD = $null
+
+          function Invoke-DocumentedInstall([string]$product) {
+            $pattern = '(?ms)^<!-- install:' + $product + ':' + $shellName + ' -->\n```\w+\n(.+?)\n```$'
+            $blocks = [regex]::Matches($docs, $pattern)
+            if ($blocks.Count -ne 1) { throw "Expected one published $product command for $shellName." }
+            $commandText = $blocks[0].Groups[1].Value
+            $suffix = @{powershell='ps1'; cmd='cmd'; bash='sh'}[$shellName]
+            $script = Join-Path $work ("install-$product." + $suffix)
+            if ($IsWindows) { $commandText = $commandText.Replace("`n", "`r`n") }
+            [IO.File]::WriteAllText($script, $commandText + [Environment]::NewLine, [Text.UTF8Encoding]::new($false))
+            switch ($shellName) {
+              powershell { & powershell.exe -NoProfile -NonInteractive -File $script }
+              cmd { & cmd.exe /d /c ('"' + $script + '"') }
+              bash { & bash $script }
+            }
+            if ($LASTEXITCODE -ne 0) { throw "$product install failed in $shellName ($LASTEXITCODE)." }
+          }
+
+          function Assert-Digest([string]$file, [string]$expected) {
+            if ((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash -ne $expected) {
+              throw "Installed file differs from the published build: $file"
+            }
+          }
+
+          if ($IsWindows) {
+            $bin = Join-Path $env:LOCALAPPDATA 'nC/toolchains/windows-x86_64/bin'
+            $kernel = Join-Path $env:LOCALAPPDATA 'nC/kernels/x86_64-unknown-none/mini-bios-20260822'
+            $compilerName = 'ncc.exe'
+            $provider = 'ncruntime.dll'
+            $compilerSha = 'f2b744f07441573ad32d274c9596bb8f131a3981b8558d6c39f16d66708b53cc'
+            $providerSha = 'bef32be8f0cf734a91d5430ee5a915079eb10563cdcab0af5ab1746cdf149cfe'
+            $target = 'x86_64-pc-windows-msvc'
+            $program = 'hello.exe'
+          } else {
+            $env:HOME = (New-Item -ItemType Directory (Join-Path $work 'user home')).FullName
+            $env:XDG_DATA_HOME = Join-Path $work 'user data'
+            $bin = Join-Path $env:XDG_DATA_HOME 'nC/toolchains/linux-x86_64/V168-R4'
+            $kernel = Join-Path $env:XDG_DATA_HOME 'nC/kernels/x86_64-unknown-none/mini-bios-20260822'
+            $compilerName = 'ncc'
+            $provider = 'libncruntime.so.2'
+            $compilerSha = 'c7a0889ff09ead304b896b3e8bee5ef9f12cb484115488e69a8473c45a0e49b3'
+            $providerSha = '43b64017d08b3f12637d2e833c97c877282bc7f258ac756d65b63cf693f4b0fc'
+            $target = 'x86_64-unknown-linux-gnu'
+            $program = 'hello'
+          }
+
+          Set-Location -LiteralPath $work
+          foreach ($attempt in 1..2) {
+            Invoke-DocumentedInstall compiler
+            Invoke-DocumentedInstall kernel
+            Assert-Digest (Join-Path $bin $compilerName) $compilerSha
+            Assert-Digest (Join-Path $bin $provider) $providerSha
+            Assert-Digest (Join-Path $kernel 'boot.img') $meta.kernel.imageSha256
+            Assert-Digest (Join-Path $kernel 'kernel.elf') $meta.kernel.elfSha256
+            Assert-Digest (Join-Path $kernel 'mini_boot_kernel.n') $meta.kernel.sourceSha256
+          }
+          if ($IsWindows) {
+            $entries = @([Environment]::GetEnvironmentVariable('Path','User') -split ';' | ForEach-Object { $_.TrimEnd('\') })
+            if (@($entries | Where-Object { $_ -eq $bin }).Count -ne 1) { throw 'User PATH registration failed.' }
+            $env:PATH = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
+          } else {
+            & bash -c '. "$HOME/.profile" && test "$(command -v ncc)" = "$HOME/.local/bin/ncc" && ncc self-test'
+            if ($LASTEXITCODE -ne 0) { throw 'User PATH registration failed.' }
+            $env:PATH = (Join-Path $env:HOME '.local/bin') + ':' + $env:PATH
+          }
+          Copy-Item -LiteralPath $hello -Destination 'hello.n'
+          Copy-Item -LiteralPath (Join-Path $bin $provider) -Destination $work
+          & ncc compiler emit-executable hello.n --target $target --out $program
+          if ($LASTEXITCODE -ne 0) { throw 'Installed compiler failed to build hello.n.' }
+          $exe = Join-Path $work $program
+          if ($IsLinux) { & chmod +x $exe }
+          $result = @(& $exe)
+          if ($LASTEXITCODE -ne 0 -or $result.Count -ne 1 -or $result[0] -cne 'Hello, nC public beta') { throw 'Unexpected hello result.' }
+
+          if ($IsWindows) {
+            foreach ($id in @('{5CFE2E8C-26A2-49EB-BF0F-A0A7F18DD655}','{1F45E3D8-459D-45C4-A483-D9CB076BFFE8}')) {
+              $job = Start-Process msiexec.exe -ArgumentList "/x $id /qn /norestart" -Wait -PassThru
+              if ($job.ExitCode -ne 0) { throw "Uninstall failed ($($job.ExitCode))." }
+            }
+            if ((Test-Path -LiteralPath $kernel) -or (Test-Path -LiteralPath $bin)) { throw 'MSI uninstall left its payload.' }
+            $remaining = @([Environment]::GetEnvironmentVariable('Path','User') -split ';' | ForEach-Object { $_.TrimEnd('\') })
+            if ($remaining -contains $bin) { throw 'MSI uninstall left its PATH entry.' }
+          }

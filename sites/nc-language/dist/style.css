@@ -287,6 +287,11 @@ img,svg,canvas{max-width:100%}
 .download-notes{max-width:800px}
 .download-notes h2{font-size:28px;margin:42px 0 18px}
 .download-notes p{color:var(--muted)}
+.terminal-install details{border-bottom:1px solid var(--line);padding:10px 0}
+.terminal-install summary{cursor:pointer;font-weight:600;padding:8px 4px}
+.terminal-install pre{max-width:100%;overflow:auto}
+.terminal-install{scroll-margin-top:5rem}
+.terminal-install code{overflow-wrap:anywhere}
 
 /* Shared utility surfaces. */
 .site-footer{border-top:1px solid var(--line);padding:38px 0 80px}

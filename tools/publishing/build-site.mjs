@@ -67,7 +67,34 @@ for(const [i,a] of articles.entries()){
  fs.writeFileSync(path.join(out,`library/${a.id}.html`),layout(a.title,body.replace('<article class="article">',`<article class="article" data-article-title="${esc(a.title)}" data-article-url="library/${a.id}.html"><div class="reading-progress" aria-hidden="true"><span></span></div><a class="mobile-breadcrumb" href="../library.html">← Library / ${a.group}</a>`),'../','article',a.body.split('\n\n')[0].replace(/`|\*\*/g,'').slice(0,160)));
 }
 const downloads=`<main id="main" class="wrap downloads"><p class="eyebrow">Native bootstrap kits</p><h1>Download ncc<span>.</span></h1><p class="lead">Get the ncc compiler for the nC programming language. Choose a ${distribution.edition} archive for your operating system. Each contains the compiler, its matching runtime library and the license notices.</p><div class="download-grid"><section><span class="eyebrow">Windows x86-64</span><h2>Windows</h2><p>Native PE compiler and DLL provider. Keep both files in the same directory.</p><a class="button primary" href="${assetBase}/${distribution.assets.windows.name}">Download ZIP ↓</a></section><section><span class="eyebrow">Linux x86-64</span><h2>Linux and WSL</h2><p>Native ELF compiler and shared library. Requires x86-64 Linux with glibc 2.34 or later.</p><a class="button primary" href="${assetBase}/${distribution.assets.linux.name}">Download TAR.GZ ↓</a></section></div><section class="download-notes"><h2>Before you start</h2><p>Verify your archive using <a href="${assetBase}/${distribution.assets.checksums.name}">SHA-256 checksums</a>. The <a href="${repo}/blob/main/docs/install.md">installation guide</a> walks through compiling your first program.</p><a class="text-link" href="${release}">Notes, hashes and instructions ↗</a><h2>Working from source</h2><p>Download the <a href="${assetBase}/${distribution.assets.sources.name}">matching compiler sources</a> for the release. The source snapshot includes a file manifest for both platforms.</p><a class="text-link" href="library/setting-up-the-toolchain.html">Toolchain setup ↗</a><h2>Read without installing</h2><p>Both manuals are available in the library and as PDFs. Machine examples containing privileged instructions are provided for analysis and inspection.</p><a class="text-link" href="library.html">Open the library ↗</a></section></main>`;
-fs.writeFileSync(path.join(out,'downloads.html'),layout('Downloads',downloads,'','downloads'));
+const packages = JSON.parse(fs.readFileSync(path.join(root, 'docs/public/terminal-install.json'), 'utf8'));
+const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8').replaceAll('\r\n', '\n');
+
+function commandPanels(product) {
+  const shells = {powershell:'Windows · PowerShell', cmd:'Windows · Command Prompt', bash:'Linux, Ubuntu and WSL · Bash'};
+  return Object.entries(shells).map(([shell, title]) => {
+    const marker = '<!-- install:' + product + ':' + shell + ' -->\n';
+    const start = readme.indexOf(marker);
+    if (start < 0 || readme.indexOf(marker, start + marker.length) !== -1) throw Error('Missing or duplicate command: ' + marker);
+    const block = readme.slice(start + marker.length).match(/^(```\w+\n[\s\S]+?\n```)\n/);
+    if (!block) throw Error('Incomplete command: ' + marker);
+    return '<details><summary>' + esc(title) + '</summary>' + markdown(block[1]) + '</details>';
+  }).join('');
+}
+
+const terminalInstall = `<section id="terminal-install" class="download-notes terminal-install" aria-labelledby="terminal-title">
+  <h2 id="terminal-title">Install from the terminal</h2>
+  <p>Choose your shell and copy the entire command. It checks your operating system and processor, verifies the package and installs ncc for your user. After installation, run <code>ncc self-test</code>.</p>
+  ${commandPanels('compiler')}
+  <p>Windows installs in <code>%LOCALAPPDATA%\u005cnC\u005ctoolchains\u005cwindows-x86_64\u005cbin</code>. Linux installs under <code>$XDG_DATA_HOME/nC</code>, defaulting to <code>~/.local/share/nC</code>, and exposes <code>~/.local/bin/ncc</code>.</p>
+  <p><a class="text-link" href="${assetBase}/${packages.assets.compilerMsi.name}">Windows per-user installer (.msi) ↓</a></p>
+  <h2 id="kernel-install">Optional nC mini kernel</h2>
+  <p>Install the x86-64 BIOS image, ELF and matching source from the 22 August 2026 kernel build. The package stores them in your user profile. Boot the image in a QEMU guest with the command in its README.</p>
+  ${commandPanels('kernel')}
+  <p><a href="${assetBase}/${packages.assets.kernelMsi.name}">Kernel MSI for Windows</a> · <a href="${assetBase}/${packages.assets.kernelImage.name}">Kernel image archive</a> · <a href="${repo}/blob/main/tools/distribution/packages/kernel-mini.md">Guest boot guide</a> · <a href="${assetBase}/INSTALL-SHA256SUMS.txt">Package checksums</a></p>
+</section>`;
+const installPage = downloads.replace('<section class="download-notes">', terminalInstall + '<section class="download-notes">');
+fs.writeFileSync(path.join(out,'downloads.html'),layout('Downloads',installPage,'','downloads'));
 const overviews=overviewPages(repo,release);
 for(const page of overviews)fs.writeFileSync(path.join(out,page.file),layout(page.title,page.body));
 fs.writeFileSync(path.join(out,'search.json'),JSON.stringify([...overviews.map(page=>({title:page.title,group:'Language and compiler',url:page.file.replace(/\.html$/,''),text:page.body.replace(/<[^>]*>/g,' ')})),...articles.map(a=>({title:a.title,group:a.group,url:articleUrl(a).replace(/\.html$/,''),text:a.body.replace(/`|\*\*/g,'')}))]));
