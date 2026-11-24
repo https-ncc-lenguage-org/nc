@@ -82,13 +82,12 @@ jobs:
           } else {
             $env:HOME = (New-Item -ItemType Directory (Join-Path $work 'user home')).FullName
             $env:XDG_DATA_HOME = Join-Path $work 'user data'
-            $bin = Join-Path $env:XDG_DATA_HOME 'nC/toolchains/linux-x86_64/V168-R4'
+            $bin = Join-Path $env:XDG_DATA_HOME 'nC/toolchains/linux-x86_64/V168-R4-standalone.1'
             $kernel = Join-Path $env:XDG_DATA_HOME 'nC/kernels/x86_64-unknown-none/mini-bios-20260822'
             $compilerName = 'ncc'
-            $provider = 'libncruntime.so.2'
-            $compilerSha = 'c7a0889ff09ead304b896b3e8bee5ef9f12cb484115488e69a8473c45a0e49b3'
-            $providerSha = '43b64017d08b3f12637d2e833c97c877282bc7f258ac756d65b63cf693f4b0fc'
-            $target = 'x86_64-unknown-linux-gnu'
+            $provider = $null
+            $compilerSha = 'abf8615d956ac2868d2f7cf74886ee1de1311d04eaeb5671160eec69aa3b3eb4'
+            $target = 'x86_64-unknown-linux-musl'
             $program = 'hello'
           }
 
@@ -97,7 +96,7 @@ jobs:
             Invoke-DocumentedInstall compiler
             Invoke-DocumentedInstall kernel
             Assert-Digest (Join-Path $bin $compilerName) $compilerSha
-            Assert-Digest (Join-Path $bin $provider) $providerSha
+            if ($provider) { Assert-Digest (Join-Path $bin $provider) $providerSha }
             Assert-Digest (Join-Path $kernel 'boot.img') $meta.kernel.imageSha256
             Assert-Digest (Join-Path $kernel 'kernel.elf') $meta.kernel.elfSha256
             Assert-Digest (Join-Path $kernel 'mini_boot_kernel.n') $meta.kernel.sourceSha256
@@ -112,11 +111,14 @@ jobs:
             $env:PATH = (Join-Path $env:HOME '.local/bin') + ':' + $env:PATH
           }
           Copy-Item -LiteralPath $hello -Destination 'hello.n'
-          Copy-Item -LiteralPath (Join-Path $bin $provider) -Destination $work
+          if ($provider) { Copy-Item -LiteralPath (Join-Path $bin $provider) -Destination $work }
           & ncc compiler emit-executable hello.n --target $target --out $program
           if ($LASTEXITCODE -ne 0) { throw 'Installed compiler failed to build hello.n.' }
           $exe = Join-Path $work $program
-          if ($IsLinux) { & chmod +x $exe }
+          if ($IsLinux) {
+            $headers = & readelf -lW $exe
+            if ($LASTEXITCODE -ne 0 -or ($headers -match 'INTERP|DYNAMIC')) { throw 'Expected a standalone Linux executable.' }
+          }
           $result = @(& $exe)
           if ($LASTEXITCODE -ne 0 -or $result.Count -ne 1 -or $result[0] -cne 'Hello, nC public beta') { throw 'Unexpected hello result.' }
 
