@@ -2,16 +2,21 @@
 
 # nC Programming Language and ncc Compiler
 
-**Typed continuity between the program, memory and machine.**
+nC is an experimental systems programming language for working with functions, memory and machine instructions in one type system. Its native compiler, **ncc**, is available for Windows and Linux x86-64.
 
-nC is an experimental programming language that integrates functions, foundational contracts, machine instructions and material primitives. Its compiler, **ncc**, is in native bootstrap. The design requires types, control flow and representation decisions to remain coherent through analysis, lowering and linking.
-
-[![Status: bootstrap V81](https://img.shields.io/badge/status-bootstrap_V81-244c3b)](docs/public/estado.md)
+[![Native compiler preview](https://img.shields.io/badge/compiler-V168_R4_preview-244c3b)](docs/public/release-v168-r4.md)
 [![License: MIT or Apache 2.0](https://img.shields.io/badge/license-MIT_or_Apache_2.0-e4edb1)](LICENSE)
 
-[**nC language**](https://ncc-lenguage.org/nc-programming-language) · [**ncc compiler**](https://ncc-lenguage.org/ncc-compiler) · [**Documentation**](https://ncc-lenguage.org/library) · [**Native downloads**](https://github.com/Arizt00/nc/releases/tag/v0.1.0-bootstrap.81) · [**Language guide**](docs/public/origen-y-guia.md) · [**Architecture**](docs/public/arquitectura-y-bootstrap.md) · [**Contribute**](CONTRIBUTING.md)
+## Download the compiler
 
-Watch the [20-second nC overview](https://ncc-lenguage.org/#overview-film): four language surfaces, the compiler pipeline and a native build, with original music and mechanical sound effects.
+| Platform | Portable download |
+| --- | --- |
+| Windows x86-64 | [Download ZIP · 8.47 MB](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-windows-x86_64.zip) |
+| Linux x86-64 and WSL | [Download tar.gz · 9.34 MB](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-linux-x86_64.tar.gz) |
+
+Each package contains `ncc`, its runtime library and the license notices. Extract it and run it directly. The compiler source is a separate download. [SHA-256 checksums](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/SHA256SUMS.txt) · [Release notes](https://github.com/https-ncc-lenguage-org/nc/releases/tag/v0.1.0-bootstrap.168.r4) · [Compiler source snapshot](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-compiler-sources.tar.gz)
+
+[**nC language**](https://ncc-lenguage.org/nc-programming-language) · [**ncc compiler**](https://ncc-lenguage.org/ncc-compiler) · [**Documentation**](https://ncc-lenguage.org/library) · [**Native downloads**](https://github.com/https-ncc-lenguage-org/nc/releases/tag/v0.1.0-bootstrap.168.r4) · [**Language guide**](docs/public/origen-y-guia.md) · [**Architecture**](docs/public/arquitectura-y-bootstrap.md) · [**Contribute**](CONTRIBUTING.md)
 
 ## Why it exists
 
@@ -19,11 +24,11 @@ Layout, alignment, address validity and calling conventions affect observable pr
 
 Memory is manual/raw. Type checking does not add ownership, automatic release or implicit pointer validation. The [language guide](docs/public/origen-y-guia.md#why-nc-exists) explains the design.
 
-Programmers coming from C can inspect the [four source surfaces](https://ncc-lenguage.org/#source-explorer), follow the [compiler pipeline](https://ncc-lenguage.org/#architecture) and review the [published evidence](https://ncc-lenguage.org/#evidence). The [website design contract](tools/publishing/DESIGN.md) and [positioning notes](docs/public/website-positioning.md) explain how those routes present the language.
+Programmers coming from C can inspect the [four source surfaces](https://ncc-lenguage.org/#source-explorer), follow the [compiler pipeline](https://ncc-lenguage.org/#architecture) and review the [published evidence](https://ncc-lenguage.org/#evidence).
 
-## Run a program
+## Compile your first program
 
-Download your platform's kit from [Releases](https://github.com/Arizt00/nc/releases/tag/v0.1.0-bootstrap.81), verify its SHA-256 digest and extract it. The kit includes the compiler, runtime and `hello.n`. This workflow requires no Rust, Cargo or LLVM installation.
+Extract the package for your platform into a new folder. Save this example as `hello.n` in that folder.
 
 ```nc
 use <io:output>;
@@ -38,7 +43,7 @@ helloCompacto {
 }
 ```
 
-On Windows x86-64, run PowerShell from the extracted directory:
+**Windows x86-64** · PowerShell
 
 ```powershell
 .\ncc.exe self-test
@@ -46,31 +51,22 @@ On Windows x86-64, run PowerShell from the extracted directory:
 .\hello.exe
 ```
 
-On Linux x86-64 or WSL:
+**Linux x86-64 or WSL**
 
-```bash
-chmod +x ncc
+```sh
 ./ncc self-test
 ./ncc compiler emit-executable hello.n --target x86_64-unknown-linux-gnu --out hello
 chmod +x hello
-LD_LIBRARY_PATH="$PWD${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" ./hello
+./hello
 ```
 
-Expected output: `Hello, nC public beta`. Exit code: `0`.
-
-The Linux kit was tested on Ubuntu 24.04 under WSL and requires glibc 2.34 symbols or later. Keep its provider beside the compiler. The native CLI is partial: `--help`, `check` and `machine` still require Stage0. Read [installation](docs/install.md) before using other routes.
+Both examples print `Hello, nC public beta` and exit with code 0. Keep the matching runtime library beside the compiler and the generated program. The Linux binaries require glibc 2.34 or later. [Installation and checksum verification](docs/install.md)
 
 ## Verified scope
 
-| Area | Scope of this edition |
-| --- | --- |
-| First use | Isolated kits, self-test, hello and arithmetic executed on Windows and Linux/WSL x86-64 |
-| V81 reconstruction | Byte-identical B2/C2 within each host; 74 units per reconstruction in the dossier |
-| V81 evidence | 147 corpus programs and 38 runtime contracts per generation and host |
-| Memory and ABI | Native alignments from 32 bytes to 1 MiB in the documented profile, subject to format limits |
-| Open work | Global Stage3 promotion, full native CLI and physical execution of other ISAs |
+The R4 packages passed self-test and compiled and ran the example above in isolated directories on Windows x86-64 and Ubuntu 24.04 under WSL. The compiler also matched eight reference reports per host for project resolution and binding. The full native CLI, complete x86 ISA coverage and the clean R4 compiler rebuild remain open. [R4 validation and binary identities](docs/public/release-v168-r4.md)
 
-V81 reconstruction results belong to the [technical dossier](docs/NCC_MODULES_V81_DOSSIER.md). [Publication validation](docs/public/validacion.md) records subsequent checks separately. This is an experimental prerelease.
+The V81 reconstruction and its historical test counts are recorded in the [V81 technical dossier](docs/NCC_MODULES_V81_DOSSIER.md).
 
 ## Documentation
 
@@ -81,6 +77,8 @@ V81 reconstruction results belong to the [technical dossier](docs/NCC_MODULES_V8
 - [Roadmap](ROADMAP.md) and [contribution guide](CONTRIBUTING.md).
 
 ## Working from source
+
+The [R4 compiler source snapshot](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-compiler-sources.tar.gz) contains 141 units per host and a SHA-256 manifest. The repository also contains the earlier bootstrap source, language examples and contributor tools.
 
 The [V81 reconstruction recipe](docs/NCC_MODULES_V81_REPRO.md) identifies the seed, B/C generations, providers and artifact comparisons. The [build contract](bootstrap/frontend-v81-build.json) fixes its inputs.
 

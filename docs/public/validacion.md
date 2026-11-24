@@ -131,4 +131,4 @@ Edge checks cover code copying, search and Escape handling, empty filters, persi
 
 Both PDFs contain nine pages: eighteen pages in total. Every page was rendered and visually reviewed. Text bounds remain inside the page. Editable Markdown sources are retained.
 
-The public export uses an explicit file selection and records source hashes in `PUBLICATION.json`. Private history, caches and local reports are excluded; native kits are release assets. Passing publication checks do not imply a passing compiler workspace or global Stage3 promotion.
+The V81 source export recorded its file selection and digests in the [historical publication manifest](https://github.com/https-ncc-lenguage-org/nc/blob/f19e6f0bfd30d72c8094f1b888799c9baa553e71/PUBLICATION.json). Private history, caches and local reports are excluded; native kits are release assets. Passing publication checks do not imply a passing compiler workspace or global Stage3 promotion.

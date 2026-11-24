@@ -1,6 +1,6 @@
 # nC status
 
-Updated 24 October 2026. Technical reference: V81.
+Updated 24 November 2026. The current compiler download is the [V168 R4 preview](release-v168-r4.md). Windows and Linux packages passed isolated self-test, compilation and execution. The sections below document the V81 edition and its reconstruction.
 
 nC is in native bootstrap. The first distribution provides a partial native compiler for Windows and Linux/WSL x86-64. Retained Stage0 is still required for other development routes.
 
@@ -10,7 +10,7 @@ The V81 dossier records identical B2/C2 digests within each host, 74 units per r
 
 See the [dossier](../NCC_MODULES_V81_DOSSIER.md), [reproduction recipe](../NCC_MODULES_V81_REPRO.md) and [ABI record](../NCC_MODULES_V81_ABI_LAYOUT.md). Evidence applies to identified generations, not automatically to every later commit.
 
-## Release limits
+## V81 release limits
 
 - The native kit supports tested `self-test`, `compiler sema`, `compiler emit-ir`, `compiler emit-object` and `compiler emit-executable` routes.
 - `--help`, `compiler --help`, `check` and `machine` can return `E_BOOTSTRAP_STAGE0_REQUIRED_001` with exit code 69.
