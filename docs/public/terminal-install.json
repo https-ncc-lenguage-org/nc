@@ -1,0 +1,28 @@
+{
+  "edition": "V168 R4",
+  "assets": {
+    "compilerMsi": {
+      "name": "ncc-v168-r4-windows-x86_64-user.msi",
+      "bytes": 5738496,
+      "sha256": "7c914937b390101882b32c6379f96f8df78e765f5e8960685cf1f0008dc901ef"
+    },
+    "kernelMsi": {
+      "name": "nc-kernel-mini-20260822-x86_64-bios-user.msi",
+      "bytes": 65536,
+      "sha256": "188b4ee519043f6db179a0146eabe43b61a45f0d18b58aefd78033a9e5bf9780"
+    },
+    "kernelImage": {
+      "name": "nc-kernel-mini-20260822-x86_64-bios.tar.gz",
+      "bytes": 48276,
+      "sha256": "aac52831dbd6628f040024288583766df9f255fda4fc759e650ca7efae87bd26"
+    }
+  },
+  "kernel": {
+    "edition": "2026-08-22",
+    "target": "x86_64-unknown-none",
+    "firmware": "BIOS",
+    "imageSha256": "d16d316eb0008b8dfb40550e8425977ff4471d4905a817159aa81ef2f496811d",
+    "elfSha256": "0f5060108802d6a3316bf76bd2813b4b383aaaa1a0feca1f9313ef16f2563e42",
+    "sourceSha256": "fb8653fc50f4374540e76b2890b2a9ede68522996c5f4888d33949dc6dc99988"
+  }
+}

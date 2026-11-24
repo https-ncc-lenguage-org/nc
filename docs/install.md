@@ -1,5 +1,20 @@
 # Install and run nC
 
+## Terminal installation
+
+Choose a command in the [repository README](../README.md#install-from-the-terminal) or on the [downloads page](https://ncc-lenguage.org/downloads#terminal-install). Both show the exact command for PowerShell, Command Prompt and Bash on Linux, Ubuntu or WSL. Run it as the user who will use the compiler.
+
+| Package | Windows x86-64 | Linux x86-64 |
+| --- | --- | --- |
+| ncc V168 R4 | `%LOCALAPPDATA%\nC\toolchains\windows-x86_64\bin` | `${XDG_DATA_HOME:-$HOME/.local/share}/nC/toolchains/linux-x86_64/V168-R4` |
+| Optional BIOS mini kernel | `%LOCALAPPDATA%\nC\kernels\x86_64-unknown-none\mini-bios-20260822` | `${XDG_DATA_HOME:-$HOME/.local/share}/nC/kernels/x86_64-unknown-none/mini-bios-20260822` |
+
+After installation run `ncc self-test`. Downloads are pinned by SHA-256. The Linux command requires Bash, curl, GNU coreutils, tar, gzip, grep and diff. It adds `~/.local/bin/ncc` and records the PATH in the first Bash login profile in use. Windows Installer records the compiler directory in the user PATH. Restart your terminal application to pick up that setting in a new process. Place the matching runtime beside executables that you build in other directories.
+
+**Removal.** Under Windows, open **Settings → Apps → Installed apps** and select the nC compiler or mini kernel individually. Windows keeps the verified MSI in `%LOCALAPPDATA%\nC\packages` for repair. After uninstalling a package you can also delete its cached MSI. On Linux, remove the `~/.local/bin/ncc` symlink if it points to this version, then remove that version's directory from the table. The optional kernel can be removed independently by deleting its own version directory. Keep the general `~/.local/bin` PATH entry if you use other tools there.
+
+The [mini kernel guide](../tools/distribution/packages/kernel-mini.md) identifies the boot image and shows the read-only QEMU guest command. [Installer and kernel checksums](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/INSTALL-SHA256SUMS.txt)
+
 ## Native V168 R4 preview
 
 Choose one archive. It contains the compiler, its matching runtime and the license notices.

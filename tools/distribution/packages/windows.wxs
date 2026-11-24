@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?if $(var.Edition) = compiler ?>
+    <?define Title="nC compiler V168 R4 (x86-64)" ?>
+    <?define Version="0.168.4" ?>
+    <?define Product="1F45E3D8-459D-45C4-A483-D9CB076BFFE8" ?>
+    <?define Upgrade="F80B0B43-0428-4980-8410-A957F5D48374" ?>
+    <?define Component="8F99CD36-3EE5-4660-BE60-E188093DD702" ?>
+    <?define Family="toolchains" ?>
+    <?define Target="windows-x86_64" ?>
+    <?define Leaf="bin" ?>
+  <?else?>
+    <?define Title="nC mini kernel (x86-64 BIOS)" ?>
+    <?define Version="0.8.22" ?>
+    <?define Product="5CFE2E8C-26A2-49EB-BF0F-A0A7F18DD655" ?>
+    <?define Upgrade="3896C1B0-E67B-4C96-BDAB-50D071F12A1E" ?>
+    <?define Component="AEF4779C-EE5A-4ECF-BE33-37AB05D4B676" ?>
+    <?define Family="kernels" ?>
+    <?define Target="x86_64-unknown-none" ?>
+    <?define Leaf="mini-bios-20260822" ?>
+  <?endif?>
+  <Product Id="$(var.Product)" Name="$(var.Title)" Language="1033" Version="$(var.Version)"
+           Manufacturer="nC Project" UpgradeCode="$(var.Upgrade)">
+    <Package InstallerVersion="500" Compressed="yes" Platform="x64" InstallScope="perUser" InstallPrivileges="limited" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version is already installed for this user." />
+    <Property Id="ARPCOMMENTS" Value="https://ncc-lenguage.org/downloads" />
+    <Property Id="NATIVE_ARCH">
+      <RegistrySearch Id="NativeArchitecture" Root="HKLM" Key="SYSTEM\CurrentControlSet\Control\Session Manager\Environment"
+                      Name="PROCESSOR_ARCHITECTURE" Type="raw" Win64="yes" />
+    </Property>
+    <Condition Message="This package requires Windows running on an x86-64 processor.">Installed OR (VersionNT64 AND NATIVE_ARCH = "AMD64")</Condition>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="LocalAppDataFolder">
+          <Directory Id="NcHome" Name="nC">
+            <Directory Id="FamilyDir" Name="$(var.Family)">
+              <Directory Id="TargetDir" Name="$(var.Target)">
+                <Directory Id="InstallDir" Name="$(var.Leaf)">
+                  <Component Id="Payload" Guid="$(var.Component)" Win64="yes">
+                    <RegistryValue Root="HKCU" Key="Software\nC\Packages\$(var.Edition)" Name="Path" Type="string" Value="[InstallDir]" KeyPath="yes" />
+                    <?if $(var.Edition) = compiler ?>
+                      <File Id="Compiler" Source="$(var.Payload)\ncc.exe" />
+                      <File Id="Runtime" Source="$(var.Payload)\ncruntime.dll" />
+                      <Environment Id="UserPath" Name="PATH" Value="[InstallDir]" Action="set" Part="last" System="no" Permanent="no" />
+                    <?else?>
+                      <File Id="KernelElf" Source="$(var.Payload)\kernel.elf" />
+                      <File Id="BootImage" Source="$(var.Payload)\boot.img" />
+                      <File Id="KernelSource" Source="$(var.Payload)\mini_boot_kernel.n" />
+                      <File Id="Instructions" Source="$(var.Payload)\README.md" />
+                    <?endif?>
+                    <File Id="License" Source="$(var.Payload)\LICENSE" />
+                    <File Id="LicenseMit" Source="$(var.Payload)\LICENSE-MIT" />
+                    <File Id="LicenseApache" Source="$(var.Payload)\LICENSE-APACHE" />
+                    <RemoveFolder Id="RemoveInstall" On="uninstall" />
+                    <RemoveFolder Id="RemoveTarget" Directory="TargetDir" On="uninstall" />
+                    <RemoveFolder Id="RemoveFamily" Directory="FamilyDir" On="uninstall" />
+                    <RemoveFolder Id="RemoveHome" Directory="NcHome" On="uninstall" />
+                  </Component>
+                </Directory>
+              </Directory>
+            </Directory>
+          </Directory>
+      </Directory>
+    </Directory>
+    <Feature Id="Complete" Title="$(var.Title)" Level="1"><ComponentRef Id="Payload" /></Feature>
+  </Product>
+</Wix>
