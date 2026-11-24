@@ -30,6 +30,10 @@ cargo test --locked --workspace --no-fail-fast -- --nocapture
 
 Some suites need additional tools or environments. Report executed checks, untested routes and exact failures. Do not weaken expectations to conceal a regression.
 
+## Public compiler packages
+
+The portable binaries are attached to GitHub Releases. The distribution manifest at `docs/public/compiler-downloads.json` records each asset name, size and SHA-256. The download verification workflow extracts each platform archive, checks its file list and builds and runs the hello example on Windows and Linux. You can run it from the Actions tab to verify the current public downloads.
+
 ## Documentation and website
 
 Editable manuals are in `docs/public/`. Generate and check the static website with:

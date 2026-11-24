@@ -1,32 +1,49 @@
 # Install and run nC
 
-## Native V81 kit
+## Native V168 R4 preview
 
-Download the Windows x86-64 or Linux x86-64 package from [Releases](https://github.com/Arizt00/nc/releases/tag/v0.1.0-bootstrap.81). Verify its digest against `SHA256SUMS.txt` and extract it into a new directory. This workflow requires no Rust, Cargo or LLVM installation.
+Choose one archive. It contains the compiler, its matching runtime and the license notices.
 
-On Windows, keep `ncc.exe`, `ncruntime.dll` and `hello.n` together:
+| Platform | Download |
+| --- | --- |
+| Windows x86-64 | [ncc for Windows](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-windows-x86_64.zip) |
+| Linux x86-64, including Ubuntu under WSL | [ncc for Linux](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-linux-x86_64.tar.gz) |
+
+Download [SHA256SUMS.txt](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/SHA256SUMS.txt) from the same release. On Windows, compare the digest printed below with the line for the Windows archive.
 
 ```powershell
+Get-FileHash .\ncc-v168-r4-windows-x86_64.zip -Algorithm SHA256
+Expand-Archive .\ncc-v168-r4-windows-x86_64.zip -DestinationPath .\ncc-r4
+Set-Location .\ncc-r4
 .\ncc.exe self-test
+```
+
+On Linux, run these commands from the download directory.
+
+```sh
+grep '  ncc-v168-r4-linux-x86_64.tar.gz$' SHA256SUMS.txt | sha256sum -c -
+mkdir ncc-r4
+tar -xzf ncc-v168-r4-linux-x86_64.tar.gz -C ncc-r4
+cd ncc-r4
+./ncc self-test
+```
+
+Save the [hello example](../examples/00_hello/hello.n) as `hello.n` beside the extracted compiler. On Windows, run the following commands in PowerShell.
+
+```powershell
 .\ncc.exe compiler emit-executable hello.n --target x86_64-pc-windows-msvc --out hello.exe
 .\hello.exe
 ```
 
-On Linux or WSL x86-64, keep `ncc`, `libncruntime.so.2` and `hello.n` together:
+On Linux or WSL, use the Linux target.
 
-```bash
-chmod +x ncc
-./ncc self-test
+```sh
 ./ncc compiler emit-executable hello.n --target x86_64-unknown-linux-gnu --out hello
 chmod +x hello
-LD_LIBRARY_PATH="$PWD${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" ./hello
+./hello
 ```
 
-Expected output: `Hello, nC public beta`. Exit code: `0`.
-
-Linux was tested on Ubuntu 24.04 under WSL with glibc 2.39. Kit imports require glibc 2.34 symbols or later; this binary condition does not certify every distribution. The compiler carries RUNPATH `$ORIGIN`. The generated example needs the explicit provider search path.
-
-Use `compiler sema hello.n` to analyze the program and `compiler emit-ir hello.n` to inspect its IR. The partial native CLI also supports tested `compiler emit-object` and `compiler emit-executable` routes. `--help`, `check` and `machine` can return `E_BOOTSTRAP_STAGE0_REQUIRED_001` with exit code 69.
+Both programs print `Hello, nC public beta` and exit with code 0. For these commands, keep `ncruntime.dll` or `libncruntime.so.2` in the same directory as the executables. The Linux compiler and the emitted hello program locate the provider beside themselves through `$ORIGIN`. Linux requires glibc 2.34 or later and was tested on Ubuntu 24.04 under WSL. [Release and source details](public/release-v168-r4.md)
 
 ## Stage0 development build
 
@@ -50,7 +67,7 @@ $env:CARGO_BUILD_JOBS = '1'
 cargo build --locked -p ncc-cli --bin ncc
 ```
 
-Replace the seed path with your verified kit. MSVC `lib.exe` is another compatible Windows archiver. The native bridge compiles `bootstrap/nc/stage0_policy.n` during the build. Missing seed configuration causes an explicit error.
+Use the seed verified for that Stage0 build. MSVC `lib.exe` is another compatible Windows archiver. The native bridge compiles `bootstrap/nc/stage0_policy.n` during the build. Missing seed configuration causes an explicit error.
 
 Once built, invoke Stage0 directly:
 

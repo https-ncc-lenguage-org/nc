@@ -11,12 +11,12 @@ const excluded=new Set(['target','dist','node_modules','.git','.ncc','.ghor','.a
 const extensions=new Set(['.rs','.n','.nm','.ncp','.ncc','.nb','.toml','.json','.lock','.md','.txt','.sh','.ps1','.cmd','.bat','.yaml','.yml','.c','.h','.cpp','.hpp','.s','.asm','.mjs','.js','.css','.html','.svg','.png','.ebnf','.grammar','.xml','.ini','.cmake','.csv','.java','.kt','.kts','.gradle','.properties','.in','.ts','.tsx']);
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'tools/release/public_beta_manifest.json'),'utf8'));
 const files=new Set(['README.md','LICENSE','LICENSE-MIT','LICENSE-APACHE','CONTRIBUTING.md','SECURITY.md','AGENTS.md','Cargo.toml','Cargo.lock','rust-toolchain.toml','nc-toolchain.toml','nc.toml','bridge.json','ghor.toml','ghor.lock','primitive.hardware.allowlist.json',...manifest.public_doc_files]);
-function walk(relative,all=false){const dir=path.join(root,relative);if(!fs.existsSync(dir))return;for(const entry of fs.readdirSync(dir,{withFileTypes:true})){if(excluded.has(entry.name)||entry.name.startsWith('.'))continue;const rel=relative+'/'+entry.name;if(entry.isSymbolicLink())continue;if(entry.isDirectory())walk(rel,all);else if(all||extensions.has(path.extname(entry.name).toLowerCase())||['Dockerfile','Makefile'].includes(entry.name))files.add(rel);}}
+function walk(relative,all=false){const dir=path.join(root,relative);if(!fs.existsSync(dir))return;for(const entry of fs.readdirSync(dir,{withFileTypes:true})){if(excluded.has(entry.name)||entry.name.startsWith('.'))continue;const rel=relative+'/'+entry.name;if(relative==='examples/12_apps/stop_world_tour_nc' && /^(?:build-report.*|.*\.link-report)\.json$/.test(entry.name))continue;if(entry.isSymbolicLink())continue;if(entry.isDirectory())walk(rel,all);else if(all||extensions.has(path.extname(entry.name).toLowerCase())||['Dockerfile','Makefile'].includes(entry.name))files.add(rel);}}
 for(const tree of trees)walk(tree);
 // Explicit compile-time fixtures; the rest of the historical archive stays private.
 files.add('_archive/old_examples/performance/native_fast/benchmark_contracts.json');
 files.add('_archive/old_examples/performance/native_fast/optimizer_pgo_hot_loop.n');
-walk('docs/public',true);walk('.github/ISSUE_TEMPLATE',true);files.add('.github/pull_request_template.md');files.add('.github/workflows/public-docs.yml');
+walk('docs/public',true);walk('.github/ISSUE_TEMPLATE',true);files.add('.github/pull_request_template.md');files.add('.github/workflows/public-docs.yml');files.add('.github/workflows/compiler-downloads.yml');
 walk('sites/nc-language/dist',true); // static output is explicitly public
 for(const e of fs.readdirSync(path.join(root,'docs'))){if(/^NCC_MODULES_V81_.*\.md$/.test(e)||/^NCC_MODULE1_V72_REPRO\.md$/.test(e))files.add('docs/'+e);}
 const findings=[];const records=[];
@@ -34,7 +34,7 @@ else if(!dry){
  fs.writeFileSync(path.join(out,'AGENTS.md'),agentText);
  const agentRecord=records.find(r=>r.path==='AGENTS.md');
  Object.assign(agentRecord,{bytes:agentText.length,sha256:crypto.createHash('sha256').update(agentText).digest('hex')});
- extra('.gitignore','/target/\n/dist/\n/_tmp/\n/reports/\n**/.ncc/\n**/.ghor/\nnode_modules/\n.env\n.env.*\n*.log\n*.exe\n*.dll\n*.so\n*.o\n*.obj\n*.zip\n*.tar.gz\n');
+ extra('.gitignore','/target/\n/dist/\n/_tmp/\n/reports/\n**/.ncc/\n**/.ghor/\nnode_modules/\n.env\n.env.*\n*.log\n*.exe\n*.dll\n*.so\n*.o\n*.obj\n*.zip\n*.tar.gz\n/examples/12_apps/stop_world_tour_nc/build-report*.json\n/examples/12_apps/stop_world_tour_nc/*.link-report.json\n');
  // Preserve source bytes so bootstrap provenance and the publication digests survive cloning.
  extra('.gitattributes','* -text\n*.pdf binary\n*.png binary\n');
  fs.writeFileSync(path.join(out,'PUBLICATION.json'),JSON.stringify({schema:'nc.publication.v1',edition:'bootstrap-v81',date:'2026-10-24',source:'curated working tree snapshot; not a clean development commit',files:records},null,2)+'\n');

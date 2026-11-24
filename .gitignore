@@ -15,3 +15,7 @@ node_modules/
 *.obj
 *.zip
 *.tar.gz
+
+# Local build and linker reports for the Stop World Tour example
+/examples/12_apps/stop_world_tour_nc/build-report*.json
+/examples/12_apps/stop_world_tour_nc/*.link-report.json

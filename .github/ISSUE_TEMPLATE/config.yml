@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Download the compiler
+    url: https://github.com/https-ncc-lenguage-org/nc/blob/main/docs/install.md
+    about: Portable Windows and Linux packages, checksums and first-program instructions
   - name: Read the documentation
     url: https://ncc-lenguage.org/library.html
     about: Installation, examples and architecture

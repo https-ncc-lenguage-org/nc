@@ -1,0 +1,79 @@
+name: Verify compiler downloads
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  portable-compiler:
+    name: Download and run (${{ matrix.platform }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows
+            runner: windows-latest
+            compiler: ncc.exe
+            provider: ncruntime.dll
+            target: x86_64-pc-windows-msvc
+            program: hello.exe
+          - platform: linux
+            runner: ubuntu-24.04
+            compiler: ncc
+            provider: libncruntime.so.2
+            target: x86_64-unknown-linux-gnu
+            program: hello
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify the published archive and compile a program
+        shell: pwsh
+        env:
+          PLATFORM: ${{ matrix.platform }}
+          COMPILER: ${{ matrix.compiler }}
+          PROVIDER: ${{ matrix.provider }}
+          TARGET_TRIPLE: ${{ matrix.target }}
+          OUTPUT_NAME: ${{ matrix.program }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $release = Get-Content docs/public/compiler-downloads.json -Raw | ConvertFrom-Json
+          if ($env:RELEASE_TAG -and $env:RELEASE_TAG -cne $release.tag) {
+            throw "The release tag differs from the checked-out distribution manifest."
+          }
+          $asset = $release.assets.($env:PLATFORM)
+          $url = "$($release.repository)/releases/download/$($release.tag)/$($asset.name)"
+          $archive = Join-Path $env:RUNNER_TEMP $asset.name
+          Invoke-WebRequest -Uri $url -OutFile $archive
+          if ((Get-Item -LiteralPath $archive).Length -ne $asset.bytes -or
+              (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash -ne $asset.sha256) {
+            throw "Downloaded archive differs from the distribution manifest."
+          }
+
+          $expected = @($env:COMPILER, $env:PROVIDER, 'LICENSE', 'LICENSE-APACHE', 'LICENSE-MIT')
+          $members = @(tar -tf $archive)
+          if ($LASTEXITCODE -ne 0 -or $members.Count -ne $expected.Count -or
+              (Compare-Object $expected $members -CaseSensitive)) {
+            throw "Unexpected files in the compiler download."
+          }
+          $kit = New-Item -ItemType Directory -Path (Join-Path $env:RUNNER_TEMP 'portable ncc')
+          tar -xf $archive -C $kit.FullName
+          if ($LASTEXITCODE -ne 0) { throw "Archive extraction failed." }
+          Copy-Item -LiteralPath examples/00_hello/hello.n -Destination $kit.FullName
+          Set-Location -LiteralPath $kit.FullName
+          $compiler = Join-Path $kit.FullName $env:COMPILER
+          $program = Join-Path $kit.FullName $env:OUTPUT_NAME
+          & $compiler self-test
+          if ($LASTEXITCODE -ne 0) { throw "Compiler self-test failed." }
+          & $compiler compiler emit-executable hello.n --target $env:TARGET_TRIPLE --out $env:OUTPUT_NAME
+          if ($LASTEXITCODE -ne 0) { throw "Could not compile hello.n." }
+          if ($IsLinux) { chmod +x $program }
+          $output = @(& $program)
+          if ($LASTEXITCODE -ne 0 -or $output.Count -ne 1 -or $output[0] -cne 'Hello, nC public beta') {
+            throw "Unexpected result from the compiled program."
+          }

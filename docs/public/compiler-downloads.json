@@ -1,0 +1,28 @@
+{
+  "edition": "V168 R4",
+  "channel": "prerelease",
+  "repository": "https://github.com/https-ncc-lenguage-org/nc",
+  "tag": "v0.1.0-bootstrap.168.r4",
+  "assets": {
+    "windows": {
+      "name": "ncc-v168-r4-windows-x86_64.zip",
+      "bytes": 8470905,
+      "sha256": "7e99913224c7e9668f8f803d40ad27759cfd0d3d9fb09bea2a7f66f1daf9f860"
+    },
+    "linux": {
+      "name": "ncc-v168-r4-linux-x86_64.tar.gz",
+      "bytes": 9343470,
+      "sha256": "dafd079e3d554f340f13a1e125be1674cc98032b0b4d78391c9923af92da3a64"
+    },
+    "sources": {
+      "name": "ncc-v168-r4-compiler-sources.tar.gz",
+      "bytes": 646109,
+      "sha256": "a2cc0bd456cbc1c64023a2d738411e56d8426e1f631083092f0cfb7935bea0b7"
+    },
+    "checksums": {
+      "name": "SHA256SUMS.txt",
+      "bytes": 297,
+      "sha256": "47902439d7f7fcdb1fc8292ad057502de40d9b6422f7a69b9aa918e12d50f45f"
+    }
+  }
+}
