@@ -1,0 +1,441 @@
+{
+  "cases": 60,
+  "hosts": {
+    "alpine": "alpine:3.22.8@sha256:49340b346798875b5592e5d420241f2f9cfba5f47e62ebb1446a1b34734e898f",
+    "ubuntu": "ubuntu:24.04@sha256:562111b88caa79c71391c0c4d3c2114a7d5c35915c20561fd893cb1e07929e6b",
+    "scratch": "empty root filesystem, Linux kernel and procfs"
+  },
+  "ncc": "abf8615d956ac2868d2f7cf74886ee1de1311d04eaeb5671160eec69aa3b3eb4",
+  "outputs": {
+    "hello": "b08ad3000e74defa3ebafbd0d1c417a4916a2b122fc2bac7e3cc8821c0a2a2b0",
+    "args": "631d6ec01fa662530195f837e827a62f0eb8b2d2a5ebe16edde3f3c09660db05",
+    "portable_math": "ae6046233de4c07a8e9c310d5f3ce915c47fdd8bec596f3e60dc601af6343c01",
+    "portable_env": "12ca8ade2d5f8606ef1d2e4011f761ceac4c3816d48b91be56e9f340c98365f1",
+    "portable_file": "f838a31c1b79130534a94c735615568d9f6c1d558a1f50beaf4870e0c8cf6394",
+    "projectbin": "b5cf7c1b8e648083f2866d9bd01f0ffa557c965b37caeade2984d41003a3c9e5",
+    "projectbin2": "b5cf7c1b8e648083f2866d9bd01f0ffa557c965b37caeade2984d41003a3c9e5"
+  },
+  "runs": [
+    {
+      "platform": "alpine",
+      "case": "self-test",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "cli-self-test",
+      "status": 0,
+      "stdout": "ncc-cli checks=37 failed=0\n",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "build-hello",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "build-args",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "build-portable_math",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "build-portable_env",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "build-portable_file",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "copied-hello",
+      "status": 0,
+      "stdout": "Hello, nC public beta\n",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "copied-portable_math",
+      "status": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "copied-portable_env",
+      "status": 0,
+      "stdout": "environment ok\n",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "copied-portable_file",
+      "status": 0,
+      "stdout": "file ok\n",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "copied-args",
+      "status": 144,
+      "stdout": "3:a b\n0:\n2:q\"\n10:back\\slash\n2:ñ\n",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "run-with-args",
+      "status": 144,
+      "stdout": "3:a b\n0:\n2:q\"\n10:back\\slash\n2:ñ\n",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "project-first",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "project-repeat",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "copied-project",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "direct-driver",
+      "status": 0,
+      "stdout": "{\"schema\":\"nc.mct.image.v1\",\"path\":\"/src/hello.n\",\"target\":\"x86_64-unknown-linux-musl\",\"format\":\"elf64\",\"format_id\":2,\"bytes\":488120,\"entry\":1052763,\"providers\":1,\"flags\":1,\"hash\":233617948}\n",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "explicit-musl",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "explicit-gnu",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "alpine",
+      "case": "invalid-source",
+      "status": 1,
+      "stdout": "error[E_SEMA_SYMBOL_UNRESOLVED_001] sema\n --> /src/reject.n:2:27\n     | sema: symbol cannot be resolved in this lexical scope\n",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "self-test",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "cli-self-test",
+      "status": 0,
+      "stdout": "ncc-cli checks=37 failed=0\n",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "build-hello",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "build-args",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "build-portable_math",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "build-portable_env",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "build-portable_file",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "copied-hello",
+      "status": 0,
+      "stdout": "Hello, nC public beta\n",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "copied-portable_math",
+      "status": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "copied-portable_env",
+      "status": 0,
+      "stdout": "environment ok\n",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "copied-portable_file",
+      "status": 0,
+      "stdout": "file ok\n",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "copied-args",
+      "status": 144,
+      "stdout": "3:a b\n0:\n2:q\"\n10:back\\slash\n2:ñ\n",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "run-with-args",
+      "status": 144,
+      "stdout": "3:a b\n0:\n2:q\"\n10:back\\slash\n2:ñ\n",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "project-first",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "project-repeat",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "copied-project",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "direct-driver",
+      "status": 0,
+      "stdout": "{\"schema\":\"nc.mct.image.v1\",\"path\":\"/src/hello.n\",\"target\":\"x86_64-unknown-linux-musl\",\"format\":\"elf64\",\"format_id\":2,\"bytes\":488120,\"entry\":1052763,\"providers\":1,\"flags\":1,\"hash\":233617948}\n",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "explicit-musl",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "explicit-gnu",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "ubuntu",
+      "case": "invalid-source",
+      "status": 1,
+      "stdout": "error[E_SEMA_SYMBOL_UNRESOLVED_001] sema\n --> /src/reject.n:2:27\n     | sema: symbol cannot be resolved in this lexical scope\n",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "self-test",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "cli-self-test",
+      "status": 0,
+      "stdout": "ncc-cli checks=37 failed=0\n",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "build-hello",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "build-args",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "build-portable_math",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "build-portable_env",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "build-portable_file",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "copied-hello",
+      "status": 0,
+      "stdout": "Hello, nC public beta\n",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "copied-portable_math",
+      "status": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "copied-portable_env",
+      "status": 0,
+      "stdout": "environment ok\n",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "copied-portable_file",
+      "status": 0,
+      "stdout": "file ok\n",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "copied-args",
+      "status": 144,
+      "stdout": "3:a b\n0:\n2:q\"\n10:back\\slash\n2:ñ\n",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "run-with-args",
+      "status": 144,
+      "stdout": "3:a b\n0:\n2:q\"\n10:back\\slash\n2:ñ\n",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "project-first",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "project-repeat",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "copied-project",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "direct-driver",
+      "status": 0,
+      "stdout": "{\"schema\":\"nc.mct.image.v1\",\"path\":\"/src/hello.n\",\"target\":\"x86_64-unknown-linux-musl\",\"format\":\"elf64\",\"format_id\":2,\"bytes\":488120,\"entry\":1052763,\"providers\":1,\"flags\":1,\"hash\":233617948}\n",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "explicit-musl",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "explicit-gnu",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "platform": "scratch",
+      "case": "invalid-source",
+      "status": 1,
+      "stdout": "error[E_SEMA_SYMBOL_UNRESOLVED_001] sema\n --> /src/reject.n:2:27\n     | sema: symbol cannot be resolved in this lexical scope\n",
+      "stderr": ""
+    }
+  ],
+  "scope": "Linux x86-64 userspace. All three test environments used containers with networking disabled during compilation and execution."
+}

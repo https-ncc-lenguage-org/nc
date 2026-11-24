@@ -77,3 +77,33 @@ jobs:
           if ($LASTEXITCODE -ne 0 -or $output.Count -ne 1 -or $output[0] -cne 'Hello, nC public beta') {
             throw "Unexpected result from the compiled program."
           }
+
+  standalone-linux:
+    name: Build and run with the standalone compiler
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the published archive and run on Alpine and Ubuntu
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest=docs/public/compiler-downloads.json
+          package=$(jq -r '.assets.standalone.name' "$manifest")
+          sum=$(jq -r '.assets.standalone.sha256' "$manifest")
+          base=$(jq -r '.repository + "/releases/download/" + .tag' "$manifest")
+          kit=$(mktemp -d)
+          curl -fsSL "$base/$package" -o "$kit/package"
+          (cd "$kit" && printf '%s  package\n' "$sum" | sha256sum -c -)
+          tar -xzf "$kit/package" -C "$kit"
+          for platform in alpine:3.22.8 ubuntu:24.04; do
+            work=$(mktemp -d)
+            chmod 755 "$work"
+            common=(--rm --read-only --network none --cap-drop ALL --user "$(id -u):$(id -g)" -e PATH=/no-toolchain)
+            docker run "${common[@]}" -v "$kit/ncc:/ncc:ro" "$platform" /ncc self-test
+            docker run "${common[@]}" -v "$kit/ncc:/ncc:ro" -v "$PWD/examples/00_hello/hello.n:/hello.n:ro" \
+              -v "$work:/work" "$platform" /ncc b /hello.n -o /work/hello -q
+            if readelf -lW "$work/hello" | grep -E 'INTERP|DYNAMIC'; then exit 1; fi
+            output=$(docker run "${common[@]}" -v "$work/hello:/hello:ro" "$platform" /hello)
+            test "$output" = 'Hello, nC public beta'
+          done

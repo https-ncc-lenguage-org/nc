@@ -23,6 +23,21 @@
       "name": "SHA256SUMS.txt",
       "bytes": 297,
       "sha256": "47902439d7f7fcdb1fc8292ad057502de40d9b6422f7a69b9aa918e12d50f45f"
+    },
+    "standalone": {
+      "name": "ncc-v168-r4-linux-x86_64-standalone.1.tar.gz",
+      "bytes": 1011668,
+      "sha256": "93763cf90826dcf75d6a873ec43bb04ead8a6be6bbfdb068d7aa0c9f4f4c355d"
+    },
+    "standaloneSources": {
+      "name": "ncc-v168-r4-linux-x86_64-standalone.1-sources.tar.gz",
+      "bytes": 769608,
+      "sha256": "7fc02c135cd750148126cd119c7e39aeeadb896793f92488e25ea0ad4feba53b"
+    },
+    "standaloneChecksums": {
+      "name": "SHA256SUMS-linux-standalone.1.txt",
+      "bytes": 230,
+      "sha256": "70af51861a0591ae23dcef1290b17ac7e49f43f0cbafb8e591ea4afd5733d2b9"
     }
   }
 }
