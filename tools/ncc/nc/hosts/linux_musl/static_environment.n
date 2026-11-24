@@ -1,0 +1,11 @@
+use <project:musl_symbols as libc>;
+
+linuxStaticEnvironment {
+    fn:
+        public:
+            lookup(handle >> addr, name >> addr) -> addr {
+                if (handle != null || name == null) return null;
+                if (cast<str>(name) != "environ") return null;
+                return adr(&libc.muslSymbols.environment);
+            }
+}

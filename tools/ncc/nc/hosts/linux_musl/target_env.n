@@ -1,0 +1,16 @@
+// Host binding selected when building the x86-64 Linux musl distribution.
+nccTargetEnv {
+    fn:
+        public:
+            host() -> str { return "x86_64-unknown-linux-musl"; }
+
+            isMusl(target >> str) -> bool {
+                return target == "x86_64-unknown-linux-musl" || target == "host";
+            }
+
+            resolved(requested >> str, layoutName >> str) -> str {
+                if (isMusl(requested)) return host();
+                return layoutName;
+            }
+    fa: return true;
+}

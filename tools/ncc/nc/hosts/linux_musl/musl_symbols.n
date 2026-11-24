@@ -1,0 +1,7 @@
+muslSymbols {
+    stc:
+        public:
+            environment >> addr <- null;
+            runtimeStart >> byte <- 0;
+            runtimeEnd >> byte <- 0;
+}

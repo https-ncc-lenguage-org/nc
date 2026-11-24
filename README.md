@@ -12,15 +12,16 @@ nC is an experimental systems programming language for working with functions, m
 | Platform | Portable download |
 | --- | --- |
 | Windows x86-64 | [Download ZIP · 8.47 MB](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-windows-x86_64.zip) |
-| Linux x86-64 and WSL | [Download tar.gz · 9.34 MB](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-linux-x86_64.tar.gz) |
+| Alpine, Ubuntu and other x86-64 Linux distributions, including WSL | [Download standalone tar.gz · 1.01 MB](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-linux-x86_64-standalone.1.tar.gz) |
+| GNU/Linux x86-64, shared-runtime edition | [Download GNU tar.gz · 9.34 MB](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-linux-x86_64.tar.gz) |
 
-Each package contains `ncc`, its runtime library and the license notices. Extract it and run it directly. The compiler source is a separate download. [SHA-256 checksums](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/SHA256SUMS.txt) · [Release notes](https://github.com/https-ncc-lenguage-org/nc/releases/tag/v0.1.0-bootstrap.168.r4) · [Compiler source snapshot](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-compiler-sources.tar.gz)
+The standalone Linux package contains one executable and license notices. It builds and runs nC programs directly using its embedded runtime. Windows and the GNU edition ship with a matching shared runtime. [Standalone checksums](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/SHA256SUMS-linux-standalone.1.txt) · [Standalone compiler and runtime sources](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-linux-x86_64-standalone.1-sources.tar.gz) [SHA-256 checksums](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/SHA256SUMS.txt) · [Release notes](https://github.com/https-ncc-lenguage-org/nc/releases/tag/v0.1.0-bootstrap.168.r4) · [Compiler source snapshot](https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-compiler-sources.tar.gz)
 
 [**nC language**](https://ncc-lenguage.org/nc-programming-language) · [**ncc compiler**](https://ncc-lenguage.org/ncc-compiler) · [**Documentation**](https://ncc-lenguage.org/library) · [**Native downloads**](https://github.com/https-ncc-lenguage-org/nc/releases/tag/v0.1.0-bootstrap.168.r4) · [**Language guide**](docs/public/origen-y-guia.md) · [**Architecture**](docs/public/arquitectura-y-bootstrap.md) · [**Contribute**](CONTRIBUTING.md)
 
 ## Install from the terminal
 
-Choose your shell and copy the whole command. It checks the host kernel and processor, verifies the package SHA-256 and installs V168 R4 for your user. Windows uses `%LOCALAPPDATA%\nC\toolchains\windows-x86_64\bin`. Linux uses `${XDG_DATA_HOME:-$HOME/.local/share}/nC/toolchains/linux-x86_64/V168-R4` and exposes `ncc` in `~/.local/bin`. Linux requires glibc 2.34 or later.
+Choose your shell and copy the whole command. It checks the host kernel and processor, verifies the package SHA-256 and installs V168 R4 for your user. Windows uses `%LOCALAPPDATA%\nC\toolchains\windows-x86_64\bin`. Linux uses `${XDG_DATA_HOME:-$HOME/.local/share}/nC/toolchains/linux-x86_64/V168-R4-standalone.1` and exposes `ncc` in `~/.local/bin`. The Linux terminal install selects the standalone edition.
 
 <details>
 <summary>Windows · PowerShell</summary>
@@ -69,7 +70,7 @@ powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference = 'St
 </details>
 
 <details>
-<summary>Linux, Ubuntu and WSL · Bash</summary>
+<summary>Alpine, Ubuntu and WSL · sh or Bash</summary>
 
 <!-- install:compiler:bash -->
 ```bash
@@ -80,25 +81,37 @@ export PATH="$HOME/.local/bin:$PATH"
   data=${XDG_DATA_HOME:-"$HOME/.local/share"}
   case "$data" in /*) ;; *) data="$HOME/.local/share" ;; esac
   parent="$data/nC/toolchains/linux-x86_64"
-  dest="$parent/V168-R4"
+  dest="$parent/V168-R4-standalone.1"
   mkdir -p -- "$parent"
   stage=$(mktemp -d -- "$parent/.install.XXXXXXXX")
-  trap 'rm -rf -- "$stage"' EXIT
-  curl --fail --silent --show-error --location --proto '=https' \
-    'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-linux-x86_64.tar.gz' -o "$stage/package"
-  (cd "$stage" && printf '%s  package\n' 'dafd079e3d554f340f13a1e125be1674cc98032b0b4d78391c9923af92da3a64' | sha256sum --check --status)
+  trap 'rm -rf -- "$stage"' 0
+  url='https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/ncc-v168-r4-linux-x86_64-standalone.1.tar.gz'
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL --proto '=https' "$url" -o "$stage/package"
+  else
+    wget -O "$stage/package" "$url"
+  fi
+  (cd "$stage" && printf '%s  package\n' '93763cf90826dcf75d6a873ec43bb04ead8a6be6bbfdb068d7aa0c9f4f4c355d' | sha256sum -c - >/dev/null)
   mkdir -- "$stage/files"
   tar -xzf "$stage/package" -C "$stage/files"
   "$stage/files/ncc" self-test
   bin="$HOME/.local/bin"
   mkdir -p -- "$bin"
   if [ -e "$bin/ncc" ] || [ -L "$bin/ncc" ]; then
-    [ "$(readlink -- "$bin/ncc")" = "$dest/ncc" ] || { echo "Another ncc already occupies $bin/ncc." >&2; exit 1; }
+    previous=$(readlink "$bin/ncc") || { echo "Another ncc already occupies $bin/ncc." >&2; exit 1; }
+    case "$previous" in
+      "$dest/ncc"|"$parent/V168-R4/ncc") ;;
+      *) echo "Another ncc already occupies $bin/ncc." >&2; exit 1 ;;
+    esac
   fi
   [ ! -L "$dest" ] || { echo "The installation directory is a symlink." >&2; exit 1; }
   if [ ! -d "$dest" ]; then mv -Tn -- "$stage/files" "$dest" || [ -d "$dest" ]; fi
   if [ -d "$stage/files" ]; then diff -qr -- "$stage/files" "$dest"; fi
-  ln -sT -- "$dest/ncc" "$bin/ncc" 2>/dev/null || [ "$(readlink -- "$bin/ncc")" = "$dest/ncc" ]
+  if [ "$(readlink "$bin/ncc" 2>/dev/null || :)" = "$parent/V168-R4/ncc" ]; then
+    ln -sfnT "$dest/ncc" "$bin/ncc"
+  else
+    ln -sT "$dest/ncc" "$bin/ncc" 2>/dev/null || [ "$(readlink "$bin/ncc")" = "$dest/ncc" ]
+  fi
   profile="$HOME/.profile"
   for file in "$HOME/.bash_profile" "$HOME/.bash_login"; do
     if [ -f "$file" ]; then profile=$file; break; fi
@@ -161,7 +174,7 @@ powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference = 'St
 </details>
 
 <details>
-<summary>Linux, Ubuntu and WSL · Bash</summary>
+<summary>Alpine, Ubuntu and WSL · sh or Bash</summary>
 
 <!-- install:kernel:bash -->
 ```bash
@@ -174,10 +187,14 @@ powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference = 'St
   dest="$parent/mini-bios-20260822"
   mkdir -p -- "$parent"
   stage=$(mktemp -d -- "$parent/.install.XXXXXXXX")
-  trap 'rm -rf -- "$stage"' EXIT
-  curl --fail --silent --show-error --location --proto '=https' \
-    'https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/nc-kernel-mini-20260822-x86_64-bios.tar.gz' -o "$stage/package"
-  (cd "$stage" && printf '%s  package\n' 'aac52831dbd6628f040024288583766df9f255fda4fc759e650ca7efae87bd26' | sha256sum --check --status)
+  trap 'rm -rf -- "$stage"' 0
+  url='https://github.com/https-ncc-lenguage-org/nc/releases/download/v0.1.0-bootstrap.168.r4/nc-kernel-mini-20260822-x86_64-bios.tar.gz'
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL --proto '=https' "$url" -o "$stage/package"
+  else
+    wget -O "$stage/package" "$url"
+  fi
+  (cd "$stage" && printf '%s  package\n' 'aac52831dbd6628f040024288583766df9f255fda4fc759e650ca7efae87bd26' | sha256sum -c - >/dev/null)
   mkdir -- "$stage/files"
   tar -xzf "$stage/package" -C "$stage/files"
   [ ! -L "$dest" ] || { echo "The installation directory is a symlink." >&2; exit 1; }
@@ -226,12 +243,12 @@ helloCompacto {
 
 ```sh
 ./ncc self-test
-./ncc compiler emit-executable hello.n --target x86_64-unknown-linux-gnu --out hello
-chmod +x hello
+./ncc r hello.n
+./ncc b hello.n -o hello
 ./hello
 ```
 
-Both examples print `Hello, nC public beta` and exit with code 0. Keep the matching runtime library beside the compiler and the generated program. The Linux binaries require glibc 2.34 or later. [Installation and checksum verification](docs/install.md)
+Both examples print `Hello, nC public beta`. Linux standalone outputs run when copied to another x86-64 Linux machine. For Windows, keep `ncruntime.dll` beside the generated executable. [Installation and checksum verification](docs/install.md)
 
 ## Verified scope
 

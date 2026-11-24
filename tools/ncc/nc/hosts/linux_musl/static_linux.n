@@ -1,0 +1,248 @@
+use <project:musl_symbols as resource, mct_image_contract as image>;
+
+nccStaticLinux {
+    const:
+        PAGE >> int <- 4096;
+        HEADER >> int <- 64;
+        PROGRAM >> int <- 56;
+        SECTION >> int <- 64;
+        SYMBOL >> int <- 24;
+        MAX_BYTES >> int <- 2147483607;
+        MAIN_PAGE >> int <- 0x3ff000;
+
+    fn:
+        private:
+            runtime() -> p<byte> {
+                return &resource.muslSymbols.runtimeStart;
+            }
+
+            runtimeBytes() -> int {
+                first >> u64 <- adr(&resource.muslSymbols.runtimeStart);
+                last >> u64 <- adr(&resource.muslSymbols.runtimeEnd);
+                if (last <= first || last-first > MAX_BYTES) return 0;
+                return cast<int>(last-first);
+            }
+
+            fits(offset >> int, count >> int, limit >> int) -> bool {
+                return offset >= 0 && count >= 0 && offset <= limit && count <= limit-offset;
+            }
+
+            small(bytes >> p<byte>, at >> int) -> int {
+                value >> u64 <- rd<u64>(off(bytes,at));
+                if (value > MAX_BYTES) return -1;
+                return cast<int>(value);
+            }
+
+            pageAfter(size >> int) -> int {
+                if (size < 0 || size > MAX_BYTES-PAGE+1) return -1;
+                return ((size+PAGE-1)/PAGE)*PAGE;
+            }
+
+            validHeader(bytes >> p<byte>, size >> int) -> bool {
+                if (size < HEADER || rd<u32>(bytes) != 0x464c457f ||
+                    rd<u16>(off(bytes,4)) != 0x0102 || rd<byte>(off(bytes,6)) != 1 ||
+                    rd<u16>(off(bytes,16)) != 2 || rd<u16>(off(bytes,18)) != 62 ||
+                    rd<u32>(off(bytes,20)) != 1 || small(bytes,32) != HEADER ||
+                    rd<u16>(off(bytes,52)) != HEADER || rd<u16>(off(bytes,54)) != PROGRAM ||
+                    rd<u16>(off(bytes,58)) != SECTION) return false;
+                programs >> int <- rd<u16>(off(bytes,56));
+                sections >> int <- rd<u16>(off(bytes,60));
+                return programs > 0 && sections > 0 && rd<u16>(off(bytes,62)) < sections &&
+                    fits(HEADER,programs*PROGRAM,size) && fits(small(bytes,40),sections*SECTION,size);
+            }
+
+            section(bytes >> p<byte>, index >> int) -> p<byte> {
+                return off(bytes,small(bytes,40)+index*SECTION);
+            }
+
+            symbolTable(bytes >> p<byte>) -> p<byte> {
+                index >> int <- 1;
+                count >> int <- rd<u16>(off(bytes,60));
+                while (index < count) {
+                    row >> p<byte> <- section(bytes,index);
+                    if (rd<u32>(off(row,4)) == 2) return row;
+                    index += 1;
+                }
+                return null;
+            }
+
+            equalName(candidate >> p<byte>, available >> int, name >> p<byte>, length >> int) -> bool {
+                if (length <= 0 || length >= available || rd<byte>(off(candidate,length)) != 0) return false;
+                at >> int <- 0;
+                while (at < length) {
+                    if (rd<byte>(off(candidate,at)) != rd<byte>(off(name,at))) return false;
+                    at += 1;
+                }
+                return true;
+            }
+
+            // Each loadable part has a non-overlapping virtual range in the linked image.
+            // The kernel obtains its auxiliary vector from the header in the first mapping.
+            runtimeExtent(bytes >> p<byte>, size >> int, headerEnd >> int) -> int {
+                if (headerEnd > PAGE) return -1;
+                count >> int <- rd<u16>(off(bytes,56));
+                first >> p<byte> <- off(bytes,HEADER);
+                if (rd<u32>(first) != 1 || rd<u32>(off(first,4)) != 4 || small(first,8) != 0 ||
+                    small(first,32) != HEADER+count*PROGRAM || small(first,40) != small(first,32)) return -1;
+                previousEnd >> int <- 0;
+                extent >> int <- headerEnd;
+                at >> int <- 0;
+                while (at < count) {
+                    row >> p<byte> <- off(bytes,HEADER+at*PROGRAM);
+                    kind >> u32 <- rd<u32>(row);
+                    if (kind == 2 || kind == 3) return -1;
+                    if (kind == 1) {
+                        fileAt >> int <- small(row,8);
+                        address >> int <- small(row,16);
+                        length >> int <- small(row,32);
+                        memory >> int <- small(row,40);
+                        if (!fits(fileAt,length,size) || !fits(address,memory,MAIN_PAGE) ||
+                            length > memory || address < previousEnd ||
+                            (at > 0 && fileAt < headerEnd)) return -1;
+                        previousEnd <- address+memory;
+                        if (fileAt+length > extent) extent <- fileAt+length;
+                    }
+                    at += 1;
+                }
+                return extent;
+            }
+
+            applicationLoads(bytes >> p<byte>, size >> int, entry >> int) -> int {
+                count >> int <- rd<u16>(off(bytes,56));
+                loads >> int <- 0;
+                containsEntry >> bool <- false;
+                previousEnd >> int <- MAIN_PAGE+PAGE;
+                at >> int <- 0;
+                while (at < count) {
+                    row >> p<byte> <- off(bytes,HEADER+at*PROGRAM);
+                    kind >> u32 <- rd<u32>(row);
+                    if (kind == 1) {
+                        address >> int <- small(row,16);
+                        length >> int <- small(row,32);
+                        memory >> int <- small(row,40);
+                        if (address < previousEnd || !fits(small(row,8),length,size) ||
+                            length > memory || !fits(address,memory,MAX_BYTES)) return -1;
+                        previousEnd <- address+memory;
+                        if ((rd<u32>(off(row,4)) & 1) != 0 && entry >= address && entry-address < length)
+                            containsEntry <- true;
+                        loads += 1;
+                    } else if (kind != 0x6474e551) return -1;
+                    at += 1;
+                }
+                return containsEntry ? loads : -1;
+            }
+
+            writeEntryPage(bytes >> p<byte>, row >> p<byte>, fileAt >> int, mainAddress >> int) -> void {
+                // The musl CRT calls the linked main symbol after initializing TLS and environ.
+                image.nccMctImageContract.put32(row,0,1);
+                image.nccMctImageContract.put32(row,4,5);
+                image.nccMctImageContract.put64(row,8,fileAt);
+                image.nccMctImageContract.put64(row,16,MAIN_PAGE);
+                image.nccMctImageContract.put64(row,24,MAIN_PAGE);
+                image.nccMctImageContract.put64(row,32,5);
+                image.nccMctImageContract.put64(row,40,5);
+                image.nccMctImageContract.put64(row,48,PAGE);
+                image.nccMctImageContract.put8(bytes,fileAt,0xe9);
+                image.nccMctImageContract.put32(bytes,fileAt+1,mainAddress-MAIN_PAGE-5);
+            }
+
+            relocateSections(bytes >> p<byte>, app >> p<byte>, appAt >> int, size >> int) -> bool {
+                table >> int <- small(app,40);
+                count >> int <- rd<u16>(off(app,60));
+                image.nccMctImageContract.put64(bytes,40,appAt+table);
+                cp(off(bytes,58),off(app,58),6);
+                index >> int <- 1;
+                while (index < count) {
+                    row >> p<byte> <- off(bytes,appAt+table+index*SECTION);
+                    old >> int <- small(row,24);
+                    length >> int <- small(row,32);
+                    if (old < 0 || old > size || length < 0) return false;
+                    if (rd<u32>(off(row,4)) != 8 && !fits(old,length,size)) return false;
+                    image.nccMctImageContract.put64(row,24,appAt+old);
+                    index += 1;
+                }
+                return true;
+            }
+
+        public:
+            providerAddress(name >> p<byte>, length >> int) -> int {
+                bytes >> p<byte> <- runtime();
+                size >> int <- runtimeBytes();
+                if (name == null || length <= 0 || !validHeader(bytes,size)) return -1;
+                symbols >> p<byte> <- symbolTable(bytes);
+                if (symbols == null || small(symbols,56) != SYMBOL) return -1;
+                first >> int <- small(symbols,24);
+                tableBytes >> int <- small(symbols,32);
+                stringsIndex >> u32 <- rd<u32>(off(symbols,40));
+                if (stringsIndex >= rd<u16>(off(bytes,60)) || !fits(first,tableBytes,size) ||
+                    tableBytes % SYMBOL != 0) return -1;
+                strings >> p<byte> <- section(bytes,stringsIndex);
+                names >> int <- small(strings,24);
+                namesBytes >> int <- small(strings,32);
+                if (rd<u32>(off(strings,4)) != 3 || !fits(names,namesBytes,size)) return -1;
+                at >> int <- SYMBOL;
+                while (at < tableBytes) {
+                    symbol >> p<byte> <- off(bytes,first+at);
+                    nameAt >> u32 <- rd<u32>(symbol);
+                    if (nameAt < namesBytes && equalName(off(bytes,names+nameAt),namesBytes-nameAt,name,length)) {
+                        definition >> int <- rd<u16>(off(symbol,6));
+                        if (rd<byte>(off(symbol,4)) != 0x12 || definition <= 0 ||
+                            definition >= rd<u16>(off(bytes,60))) return -1;
+                        code >> p<byte> <- section(bytes,definition);
+                        address >> int <- small(symbol,8);
+                        begin >> int <- small(code,16);
+                        if (begin < 0 || address < begin || address-begin >= small(code,32) ||
+                            (rd<u64>(off(code,8)) & 6) != 6) return -1;
+                        return address;
+                    }
+                    at += SYMBOL;
+                }
+                return -1;
+            }
+
+            combine(application >> p<byte>, mainAddress >> int) -> p<byte> {
+                template >> p<byte> <- runtime();
+                size >> int <- runtimeBytes();
+                app >> p<byte> <- image.nccMctImageContract.data(application);
+                appBytes >> int <- image.nccMctImageContract.bytes(application);
+                if (!validHeader(template,size) || !validHeader(app,appBytes)) return null;
+                loads >> int <- applicationLoads(app,appBytes,mainAddress);
+                if (loads <= 0) return null;
+                runtimeHeaders >> int <- rd<u16>(off(template,56));
+                count >> int <- runtimeHeaders+loads+1;
+                headerEnd >> int <- HEADER+count*PROGRAM;
+                extent >> int <- runtimeExtent(template,size,headerEnd);
+                entryAt >> int <- pageAfter(extent);
+                if (entryAt < 0 || entryAt > MAX_BYTES-PAGE) return null;
+                appAt >> int <- entryAt+PAGE;
+                if (!fits(appAt,appBytes,MAX_BYTES)) return null;
+                entry >> int <- small(template,24);
+                result >> p<byte> <- image.nccMctImageContract.make(2,1,appAt+appBytes,entry,
+                    image.nccMctImageContract.providers(application),1);
+                if (result == null) return null;
+                out >> p<byte> <- image.nccMctImageContract.data(result);
+                cp(out,template,extent);
+                cp(off(out,appAt),app,appBytes);
+                image.nccMctImageContract.put16(out,56,count);
+                image.nccMctImageContract.put64(out,HEADER+32,headerEnd);
+                image.nccMctImageContract.put64(out,HEADER+40,headerEnd);
+                rowAt >> int <- HEADER+runtimeHeaders*PROGRAM;
+                writeEntryPage(out,off(out,rowAt),entryAt,mainAddress);
+                rowAt += PROGRAM;
+                index >> int <- 0;
+                while (index < rd<u16>(off(app,56))) {
+                    src >> p<byte> <- off(app,HEADER+index*PROGRAM);
+                    if (rd<u32>(src) == 1) {
+                        cp(off(out,rowAt),src,PROGRAM);
+                        image.nccMctImageContract.put64(out,rowAt+8,appAt+small(src,8));
+                        rowAt += PROGRAM;
+                    }
+                    index += 1;
+                }
+                if (!relocateSections(out,app,appAt,appBytes)) {
+                    image.nccMctImageContract.release(result);
+                    return null;
+                }
+                return image.nccMctImageContract.finish(result);
+            }
+}
