@@ -1,24 +1,39 @@
-import {renderSurfaceExplorer} from './surfaces.mjs';
+import {renderSurfaceExplorer, highlightNC} from './surfaces.mjs';
 const escape=value=>value.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 export function renderHome({repo,release,hello,surfaces}) {
   const film={video:'assets/media/nc-overview-02253c64e0eb.mp4',poster:'assets/media/nc-overview-poster-b076bf10f2c8.webp',captions:'assets/media/nc-overview-en-01b8ce0208d4.vtt'};
   const phases=[['Source','.n','Declarations and imports'],['Analysis','AST','Symbols, types and flow'],['Representation','IR','Lowering and transformations'],['Materialization','ABI','Objects and linking'],['Execution','PE / ELF','Runtime and observable effects']];
   const recipe=['.\\ncc.exe self-test','.\\ncc.exe compiler emit-executable hello.n `','  --target x86_64-pc-windows-msvc --out hello.exe','.\\hello.exe'].join('\n');
 return `<main id="main">
-  <section class="lift-hero" aria-labelledby="hero-title">
-    <canvas class="lift-field" id="lift-field" data-field="hero" aria-hidden="true"></canvas>
-    <div class="lift-intro wrap">
-      <a class="lift-pill" href="${release}"><span class="lift-new">New</span>Native compiler preview<span class="lift-pill-more"> · Windows and Linux x86-64</span><span aria-hidden="true">→</span></a>
-      <p class="lift-brand" aria-hidden="true"><span class="lift-glyph">nC<span>_</span></span> Systems programming language</p>
-      <h1 id="hero-title">Control at<br> every level.</h1>
-      <p class="lift-lead">Functions, explicit memory and typed machine instructions. nC brings them into one continuous language, so the program's meaning stays in view from source to machine.</p>
-      <div class="actions lift-actions"><a class="button primary" href="downloads.html">Get ncc <span aria-hidden="true">↓</span></a><a class="button secondary" href="nc-programming-language.html">Read the language</a></div>
+  <section class="ed-hero wrap" aria-labelledby="hero-title">
+    <p class="ed-edition"><a href="${release}">Native compiler preview</a><span>Windows and Linux x86-64</span></p>
+    <h1 id="hero-title">Control at<br> every level.</h1>
+    <div class="ed-intro">
+      <p class="ed-lead">Functions, explicit memory and typed machine instructions. nC brings them into one continuous language, so the program's meaning stays in view from source to machine.</p>
+      <div class="actions"><a class="button primary" href="downloads.html">Get ncc <span aria-hidden="true">↓</span></a><a class="button secondary" href="nc-programming-language.html">Read the language</a></div>
       <p class="lift-links"><a class="film-jump" href="#overview-film"><span aria-hidden="true">▷</span> Watch the film</a><a href="#from-c">Coming from C? Start with the design choices <span aria-hidden="true">↗</span></a></p>
     </div>
   </section>
-  <section class="lift-showcase wrap" aria-label="Read nC source">
-    <div class="lift-glow" aria-hidden="true"></div>
-    ${renderSurfaceExplorer(surfaces,repo)}
+  <nav class="ed-toc wrap" aria-label="Start here">
+    <a href="library/why-nc-exists.html"><span class="ed-num">01</span><span class="ed-title">Why nC exists</span><span class="ed-desc">The language and its purpose</span><span class="ed-arrow" aria-hidden="true">↗</span></a>
+    <a href="library/setting-up-the-toolchain.html"><span class="ed-num">02</span><span class="ed-title">Set up the toolchain</span><span class="ed-desc">Native kits and prerequisites</span><span class="ed-arrow" aria-hidden="true">↗</span></a>
+    <a href="#run"><span class="ed-num">03</span><span class="ed-title">Run a first program</span><span class="ed-desc">Source, command and result</span><span class="ed-arrow" aria-hidden="true">↓</span></a>
+    <a href="library/contracts-between-levels.html"><span class="ed-num">04</span><span class="ed-title">Contracts between levels</span><span class="ed-desc">How the four surfaces connect</span><span class="ed-arrow" aria-hidden="true">↗</span></a>
+  </nav>
+  <section class="strata" aria-labelledby="strata-title">
+    <canvas class="lift-field" data-field="universe" aria-hidden="true"></canvas>
+    <div class="wrap strata-grid">
+      <div class="strata-copy">
+        <p class="eyebrow">Four surfaces. One semantic model.</p>
+        <h2 id="strata-title">One language.<br><span class="strata-grad">Four layers deep.</span></h2>
+        <p>Functions, foundations, machine instructions and hardware primitives share one model. Choose a layer and read the real source.</p>
+        <a class="text-link" href="library/contracts-between-levels.html">Read about semantic continuity</a>
+      </div>
+      <div class="strata-stage">
+        <div class="strata-deck" aria-hidden="true">${surfaces.map(example=>`<div class="strata-card" data-layer="${example.id}"><div class="strata-card-top"><code translate="no">${escape(example.mark)}</code><span>${escape(example.name)}</span></div><pre><code translate="no">${highlightNC(example.code)}</code></pre></div>`).join('')}</div>
+        ${renderSurfaceExplorer(surfaces,repo)}
+      </div>
+    </div>
   </section>
   <section class="contract-summary wrap" aria-label="The nC programming model"><p><code translate="no">[@]</code><span>Foundations stay explicit.</span></p><p><code translate="no">[@machine]</code><span>Machine control stays typed.</span></p><p><code translate="no">primitive[@]</code><span>Representation stays part of the model.</span></p></section>
   <section id="overview-film" class="overview-film wrap section-space" aria-labelledby="film-title">
@@ -53,10 +68,16 @@ return `<main id="main">
   <section id="architecture" class="continuity-section section-space"><div class="wrap"><div class="section-top"><div><p class="eyebrow">Inside the compiler</p><h2>Follow the program through ncc.</h2></div><p class="section-description">Explore the compiler pipeline.<br>Select a phase to inspect its responsibility.</p></div><div class="continuity-grid"><div class="pipeline-map" role="tablist" aria-label="Compiler phases" aria-orientation="vertical">${phases.map((phase,i)=>`<button role="tab" id="phase-tab-${i}" aria-selected="${i===0}" aria-controls="phase-panel" tabindex="${i===0?'0':'-1'}" class="phase ${i===0?'active':''}" data-phase="${i}"><span class="phase-index">0${i+1}</span><span class="phase-name">${phase[0]}<small>${phase[2]}</small></span><code>${phase[1]}</code><span class="phase-indicator" aria-hidden="true">↗</span></button>`).join('')}</div>
     <div class="phase-panel" id="phase-panel" role="tabpanel" aria-labelledby="phase-tab-0" tabindex="0"><div class="phase-panel-top"><span class="eyebrow" id="phase-label">01 / SOURCE</span><span class="contract-tag">Phase reference</span></div><div class="contract-visual" aria-hidden="true"><div><span class="contract-mark" id="phase-mark">.n</span><span class="contract-caption">nC / semantic continuity</span></div></div><h3 id="phase-title">Declare the program.</h3><p id="phase-description">Functions, typed places and imports define program units. Visibility, control flow and representation must retain their identity through analysis.</p><div class="phase-detail"><span>Source reference</span><code id="phase-code">examples/00_hello/hello.n</code></div><a class="text-link" id="phase-link" href="library/the-first-program.html">Read the contract <span>↗</span></a></div></div></div></section>
 
-  <section class="first-program wrap section-space" aria-labelledby="first-program-title">
-    <div class="section-top"><div><p class="eyebrow">Build with ncc</p><h2 id="first-program-title">A first program, end to end.</h2></div><p class="section-description">Download the compiler. Save the example as hello.n.<br>Verify the result on your machine.</p></div>
-    <div class="program-grid"><div class="source-window"><div class="window-bar"><span><i></i> hello.n</span><button class="copy-hero" type="button" aria-label="Copy the hello.n source">Copy source</button></div><pre><code>${escape(hello)}</code></pre><a href="library/the-first-program.html">Read the annotated example <span>↗</span></a></div>
-    <div class="terminal"><div class="terminal-tabs" role="tablist" aria-label="Operating system"><button role="tab" id="os-windows" aria-selected="true" aria-controls="terminal-panel" data-os="windows">Windows <small>x86-64</small></button><button role="tab" id="os-linux" aria-selected="false" aria-controls="terminal-panel" tabindex="-1" data-os="linux">Linux / WSL <small>x86-64</small></button><button id="copy-commands" type="button" aria-label="Copy commands for the selected system">Copy ⧉</button></div><div id="terminal-panel" role="tabpanel" aria-labelledby="os-windows"><div class="terminal-location"><span>❯</span><span id="terminal-shell">PowerShell · inside the extracted kit</span></div><pre id="terminal-commands"><code>${escape(recipe)}</code></pre><div class="terminal-output"><span>Expected output</span><pre>Hello, nC public beta</pre><small><i></i> Exit code 0</small></div><p class="terminal-limit">See the <a href="${release}">release notes</a> for supported commands and platform requirements.</p></div></div></div>
+  <section id="run" class="first-program run wrap section-space" aria-labelledby="first-program-title">
+    <div class="run-head"><p class="eyebrow">From zero to a native executable</p><h2 id="first-program-title">Three steps.<br>One real binary.</h2><p class="section-description">Pick your system, save the program and run the commands. The replay follows a verified run of the public kit.</p></div>
+    <div class="terminal-tabs run-os" role="tablist" aria-label="Operating system"><button role="tab" id="os-windows" aria-selected="true" aria-controls="terminal-panel" data-os="windows">Windows <small>x86-64</small></button><button role="tab" id="os-linux" aria-selected="false" aria-controls="terminal-panel" tabindex="-1" data-os="linux">Linux / WSL <small>x86-64</small></button></div>
+    <div class="run-grid">
+      <div class="run-card">
+        <ol class="run-steps"><li><span class="run-badge">1</span><div><h3>Get ncc</h3><p>Download the native kit for your system and run the self-test. <a href="downloads.html">Get the kit</a></p></div></li><li><span class="run-badge">2</span><div><h3>Save hello.n</h3><p>The program prints one line and returns true from its final.</p></div></li><li><span class="run-badge">3</span><div><h3>Build and run</h3><p>emit-executable produces a native PE or ELF file you can run directly.</p></div></li></ol>
+        <div class="source-window"><div class="window-bar"><span><i></i> hello.n</span><button class="copy-hero" type="button" aria-label="Copy the hello.n source">Copy source</button></div><pre><code>${highlightNC(hello)}</code></pre><a href="library/the-first-program.html">Read the annotated example <span>↗</span></a></div>
+      </div>
+      <div class="terminal"><div class="run-bar"><span class="run-dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="terminal-shell">PowerShell · inside the extracted kit</span><span class="run-actions"><button id="copy-commands" type="button" aria-label="Copy commands for the selected system">Copy</button><button id="run-replay" type="button">Run <span aria-hidden="true">▸</span></button></span></div><div id="terminal-panel" role="tabpanel" aria-labelledby="os-windows"><pre id="terminal-commands"><code>${escape(recipe)}</code></pre><div class="terminal-output" aria-live="polite"><span>Expected output</span><pre>Hello, nC public beta</pre><small><i></i> Exit code 0</small></div><p class="terminal-limit">Replay of the verified public-kit run. See the <a href="${release}">release notes</a> for supported commands and platform requirements.</p></div></div>
+    </div>
     <div class="section-foot"><span>Keep the compiler and its runtime provider together.</span><a href="downloads.html">Get the native kit <span>↗</span></a></div>
   </section>
 
