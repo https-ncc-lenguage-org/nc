@@ -692,3 +692,72 @@ body[data-atmosphere=hero] .site-footer{position:relative;z-index:1;background:v
 body[data-atmosphere=hero] .motion-context{display:none}
 body[data-atmosphere=hero] .motion-controls{border-radius:999px;background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(10px)}
 @media (max-width:1000px){.ag-row-flip{grid-template-columns:1fr}}
+
+/* ============ Clean white, no cards, a colour per section (2026-11) ============ */
+.ag-c1{--sec:#b8612f}.ag-c2{--sec:#a83e7c}.ag-c3{--sec:#5b4fc7}.ag-c4{--sec:#2563c9}.ag-c5{--sec:#1b7d71}
+:root[data-theme=dark] .ag-c1{--sec:#e3a173}:root[data-theme=dark] .ag-c2{--sec:#e08ab8}:root[data-theme=dark] .ag-c3{--sec:#a59cf0}:root[data-theme=dark] .ag-c4{--sec:#7fb0f5}:root[data-theme=dark] .ag-c5{--sec:#6fd0c2}
+.ag-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ag-glow::before{display:none}
+.ag-copy h2::after,.ag-choices h2::after{content:"";display:inline-block;width:.2em;height:.2em;margin-left:.1em;border-radius:50%;background:var(--sec)}
+.ag-link,.ag-link:hover{background:none;padding:0;min-height:44px;color:var(--sec)}
+.ag-link:hover{gap:12px}
+.ag-media>.source-workbench,.ag-media>.continuity-grid,.ag-media>.ag-table{border:0;background:transparent;box-shadow:none;border-radius:0;overflow:visible}
+.ag .source-workbench{backdrop-filter:none}
+.ag .surface-tabs{border:0;padding:0 0 18px;gap:26px}
+.ag .surface-tabs button,.ag .surface-tabs button[aria-selected=true]{background:none;color:var(--muted);border-radius:0;padding:0;min-height:44px;font-size:15px;box-shadow:inset 0 -2px 0 transparent;transition:color .2s,box-shadow .3s}
+.ag .surface-tabs button:nth-child(1){--tab:#b8612f}.ag .surface-tabs button:nth-child(2){--tab:#a83e7c}.ag .surface-tabs button:nth-child(3){--tab:#5b4fc7}.ag .surface-tabs button:nth-child(4){--tab:#2563c9}
+.ag .surface-tabs button[aria-selected=true]{color:var(--text);box-shadow:inset 0 -2px 0 var(--tab)}
+.ag .surface-tabs button:hover{color:var(--text);background:none}
+.ag .workbench-toolbar{padding:0;justify-content:flex-end}
+.ag .workbench-toolbar button{color:var(--sec);font-weight:600}
+.ag .source-context{padding:0 0 10px;border:0;color:var(--faint)}
+.ag .surface-panel pre{padding:0;font-size:15px;line-height:1.75;background:transparent;border:0;height:auto;max-height:none}
+.ag .surface-notes,.ag .source-references{padding:18px 0 0;border:0;background:transparent}
+.ag .surface-notes h2{font:400 20px var(--sans);margin:0 0 6px}
+.ag .source-references a{color:var(--sec)}
+
+.ag-media>.continuity-grid{grid-template-columns:1fr;padding:0;gap:26px}
+.ag .pipeline-map{display:flex;justify-content:space-between;gap:8px;padding:0;position:relative}
+.ag .pipeline-map::before{content:"";position:absolute;left:28px;right:28px;top:22px;height:2px;border-radius:2px;background:linear-gradient(90deg,#d6895a,#c8619a,#7b6fe0,#3d7fe0,#2fa597);opacity:.55}
+.ag .phase,.ag .phase.active{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;background:none;box-shadow:none;border:0;padding:0;min-height:0;margin:0;position:relative}
+.ag .phase::before{content:"";width:16px;height:16px;margin:15px 0 6px;border-radius:50%;background:var(--bg);border:2px solid var(--dot);transition:transform .3s var(--ease),background .3s}
+.ag .phase:nth-child(1){--dot:#d6895a}.ag .phase:nth-child(2){--dot:#c8619a}.ag .phase:nth-child(3){--dot:#7b6fe0}.ag .phase:nth-child(4){--dot:#3d7fe0}.ag .phase:nth-child(5){--dot:#2fa597}
+.ag .phase.active::before,.ag .phase:hover::before{background:var(--dot);transform:scale(1.35)}
+.ag .phase-name{font-size:14px;color:var(--muted)}.ag .phase-name small{display:none}
+.ag .phase.active .phase-name{color:var(--text);font-weight:600}
+.ag .phase code{color:var(--dot);font-size:13px}
+.ag .phase-panel{background:transparent;padding:6px 0 0;border-radius:0}
+.ag .contract-visual{display:none}
+.ag .phase-panel h3{font:400 26px var(--sans);letter-spacing:-.02em;margin:0 0 10px}
+.ag .phase-detail{border:0;padding:0;margin:14px 0}
+
+.ag-run{gap:30px}
+.ag-run .source-window,.ag-run .terminal{border:0;background:transparent;box-shadow:none;border-radius:0;--text:#121317;--muted:#5d6168;--faint:#6f747b;--line:transparent}
+:root[data-theme=dark] .ag-run .terminal{--text:#f1f3f4;--muted:#a3a8b0;--faint:#8d939b}
+.ag-run .window-bar,.ag-run .run-bar{padding:0 0 10px;border:0;font:400 13px var(--mono);color:var(--faint)}
+.ag-run .source-window pre{padding:0;font-size:15px}
+.ag-run #terminal-commands{padding:0;color:var(--text);min-height:0;font-size:15px}
+.ag-run #terminal-commands code::before{content:"$ ";color:var(--sec)}
+.ag-run .terminal-output{padding:10px 0 0}
+.ag-run .terminal-output pre{color:var(--sec);font-weight:600}
+.ag-run .run-actions button{background:var(--soft);color:var(--text)}
+.ag-run #run-replay{background:var(--sec);color:#fff}
+
+.ag-table caption{padding:0 0 10px}
+.ag-table th,.ag-table td{padding:18px 0;border-top:1px solid var(--line)}
+.ag-table th{padding-right:24px;color:var(--sec)}
+
+.ag-film{max-width:1320px}
+.ag-film-stage{position:relative;width:100%;aspect-ratio:16/9;cursor:pointer}
+.ag-film-stage canvas{display:block;width:100%;height:100%}
+:root[data-theme=dark] .ag-film-stage canvas{border-radius:28px}
+.ag-film-progress{position:absolute;left:8%;right:8%;bottom:0;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
+.ag-film-progress span{display:block;height:100%;transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,#d6895a,#c8619a,#7b6fe0,#3d7fe0,#2fa597)}
+.ag-film-bar{display:flex;align-items:flex-start;justify-content:center;gap:22px;margin-top:18px;flex-wrap:wrap}
+.ag-chip{border:0;background:none;color:var(--muted);font:600 14px var(--sans);min-height:44px;cursor:pointer}
+.ag-chip:hover{color:var(--text)}
+.ag-film .film-transcript{margin:0;max-width:760px}
+.ag-film .film-transcript summary{min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer}
+@media (max-width:640px){.ag .pipeline-map{overflow-x:auto}.ag .phase-name{font-size:12px}.ag .surface-tabs{gap:16px;overflow-x:auto}}
+.ag-run #copy-commands,.ag-run .copy-hero{background:transparent!important;color:var(--sec)!important;border:0;min-height:40px;padding:0 6px;font:600 13px var(--sans)}
+.ag .run-os button{display:inline-flex;align-items:center;justify-content:center}
