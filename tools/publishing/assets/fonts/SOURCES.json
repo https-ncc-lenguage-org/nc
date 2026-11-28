@@ -22,6 +22,18 @@
       "sha256": "ba204497f16b6d334cee9d1e963a831b73e3a56e1d6300a8489d18df7214b350"
     },
     {
+      "name": "IBMPlexSerif-Light.woff2",
+      "url": "https://raw.githubusercontent.com/IBM/plex/master/packages/plex-serif/fonts/complete/woff2/IBMPlexSerif-Light.woff2",
+      "bytes": 71712,
+      "sha256": "31d3859813dff22a30468ac92ead0b80d561d18973e73b1e112957613a6f03db"
+    },
+    {
+      "name": "IBMPlexSerif-LightItalic.woff2",
+      "url": "https://raw.githubusercontent.com/IBM/plex/master/packages/plex-serif/fonts/complete/woff2/IBMPlexSerif-LightItalic.woff2",
+      "bytes": 76340,
+      "sha256": "a957e2f79f5b717d612379d3010c3600ff2d3bc7f701f62fb213ea1f21bddc0d"
+    },
+    {
       "name": "LICENSE.txt",
       "url": "https://raw.githubusercontent.com/IBM/plex/master/LICENSE.txt",
       "bytes": 4456,
