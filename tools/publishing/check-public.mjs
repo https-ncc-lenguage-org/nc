@@ -15,7 +15,7 @@ for(const file of walk(dist).filter(file=>file.endsWith('.html'))){
   if((html.match(/id="motion-toggle"/g)||[]).length!==1)errors.push(relative+': expected one shared motion control');
   if(!html.includes('data-atmosphere="'+expected+'"'))errors.push(relative+': wrong particle profile');
   if(!/src="[^"]*scene\.js\?v=[a-f0-9]{12}"/.test(html))errors.push(relative+': missing versioned particle script');
-  if((html.match(/id="continuity-canvas"/g)||[]).length!==(relative==='index.html'?1:0))errors.push(relative+': unexpected hero canvas');
+  if((html.match(/id="ag-journey"/g)||[]).length!==(relative==='index.html'?1:0))errors.push(relative+': unexpected journey canvas');
   animatedPages++;if(expected==='reading')readingPages++;
 }
 const index=JSON.parse(fs.readFileSync(path.join(dist,'search.json'),'utf8'));

@@ -4,48 +4,25 @@ export function renderHome({repo,release,hello,surfaces}) {
   const film={video:'assets/media/nc-overview-02253c64e0eb.mp4',poster:'assets/media/nc-overview-poster-b076bf10f2c8.webp',captions:'assets/media/nc-overview-en-01b8ce0208d4.vtt'};
   const phases=[['Source','.n','Declarations and imports'],['Analysis','AST','Symbols, types and flow'],['Representation','IR','Lowering and transformations'],['Materialization','ABI','Objects and linking'],['Execution','PE / ELF','Runtime and observable effects']];
   const recipe=['.\\ncc.exe self-test','.\\ncc.exe compiler emit-executable hello.n `','  --target x86_64-pc-windows-msvc --out hello.exe','.\\hello.exe'].join('\n');
-return `<main id="main">
-  <section class="ed-hero wrap" aria-labelledby="hero-title">
-    <p class="ed-edition"><a href="${release}">Native compiler preview</a><span>Windows and Linux x86-64</span></p>
+return `<main id="main" class="ag">
+  <canvas class="ag-journey" id="ag-journey" aria-hidden="true"></canvas>
+
+  <section class="ag-hero" data-form="orbit" aria-labelledby="hero-title">
+    <p class="ag-mark" aria-hidden="true">nC<span>_</span></p>
     <h1 id="hero-title">Control at<br> every level.</h1>
-    <div class="ed-intro">
-      <p class="ed-lead">Functions, explicit memory and typed machine instructions. nC brings them into one continuous language, so the program's meaning stays in view from source to machine.</p>
-      <div class="actions"><a class="button primary" href="downloads.html">Get ncc <span aria-hidden="true">↓</span></a><a class="button secondary" href="nc-programming-language.html">Read the language</a></div>
-      <p class="lift-links"><a class="film-jump" href="#overview-film"><span aria-hidden="true">▷</span> Watch the film</a><a href="#from-c">Coming from C? Start with the design choices <span aria-hidden="true">↗</span></a></p>
-    </div>
+    <p class="ag-sub">One continuous systems language, from functions to machine instructions.</p>
+    <div class="ag-actions"><a class="ag-btn ag-btn-ink" href="downloads.html">Get ncc <span aria-hidden="true">↓</span></a><a class="ag-btn ag-btn-soft" href="nc-programming-language.html">Read the language</a></div>
   </section>
-  <nav class="ed-toc wrap" aria-label="Start here">
-    <a href="library/why-nc-exists.html"><span class="ed-num">01</span><span class="ed-title">Why nC exists</span><span class="ed-desc">The language and its purpose</span><span class="ed-arrow" aria-hidden="true">↗</span></a>
-    <a href="library/setting-up-the-toolchain.html"><span class="ed-num">02</span><span class="ed-title">Set up the toolchain</span><span class="ed-desc">Native kits and prerequisites</span><span class="ed-arrow" aria-hidden="true">↗</span></a>
-    <a href="#run"><span class="ed-num">03</span><span class="ed-title">Run a first program</span><span class="ed-desc">Source, command and result</span><span class="ed-arrow" aria-hidden="true">↓</span></a>
-    <a href="library/contracts-between-levels.html"><span class="ed-num">04</span><span class="ed-title">Contracts between levels</span><span class="ed-desc">How the four surfaces connect</span><span class="ed-arrow" aria-hidden="true">↗</span></a>
-  </nav>
-  <section class="strata" aria-labelledby="strata-title">
-    <canvas class="lift-field" data-field="universe" aria-hidden="true"></canvas>
-    <div class="wrap strata-grid">
-      <div class="strata-copy">
-        <p class="eyebrow">Four surfaces. One semantic model.</p>
-        <h2 id="strata-title">One language.<br><span class="strata-grad">Four layers deep.</span></h2>
-        <p>Functions, foundations, machine instructions and hardware primitives share one model. Choose a layer and read the real source.</p>
-        <a class="text-link" href="library/contracts-between-levels.html">Read about semantic continuity</a>
-      </div>
-      <div class="strata-stage">
-        <div class="strata-deck" aria-hidden="true">${surfaces.map(example=>`<div class="strata-card" data-layer="${example.id}"><div class="strata-card-top"><code translate="no">${escape(example.mark)}</code><span>${escape(example.name)}</span></div><pre><code translate="no">${highlightNC(example.code)}</code></pre></div>`).join('')}</div>
-        ${renderSurfaceExplorer(surfaces,repo)}
-      </div>
-    </div>
-  </section>
-  <section class="contract-summary wrap" aria-label="The nC programming model"><p><code translate="no">[@]</code><span>Foundations stay explicit.</span></p><p><code translate="no">[@machine]</code><span>Machine control stays typed.</span></p><p><code translate="no">primitive[@]</code><span>Representation stays part of the model.</span></p></section>
-  <section id="overview-film" class="overview-film wrap section-space" aria-labelledby="film-title">
-    <div class="section-top"><div><p class="eyebrow">Language overview</p><h2 id="film-title">See nC in 20 seconds.</h2></div><p id="film-description" class="section-description">Four language surfaces. One compiler pipeline. A native build, from source to execution.</p></div>
-    <figure class="film-player">
-      <div class="film-screen"><video id="nc-overview-video" controls playsinline preload="none" poster="${film.poster}" width="1920" height="1080" tabindex="0" aria-label="nC overview — 20-second video" aria-describedby="film-description film-caption">
+
+  <section id="overview-film" class="ag-film" data-form="ring" aria-label="nC in 20 seconds">
+    <figure class="film-player ag-frame-dark">
+      <div class="film-screen"><video id="nc-overview-video" controls playsinline preload="none" poster="${film.poster}" width="1920" height="1080" tabindex="0" aria-label="nC overview — 20-second video" aria-describedby="film-caption">
         <source src="${film.video}" type="video/mp4">
         <track kind="captions" src="${film.captions}" srclang="en" label="English">
         <p><a href="${film.video}">Download the nC overview video</a> or read the transcript below.</p>
-      </video><button id="film-play" class="film-play" type="button" aria-controls="nc-overview-video" hidden><span aria-hidden="true">▶</span> Play with sound</button></div>
+      </video><button id="film-play" class="film-play" type="button" aria-controls="nc-overview-video" hidden><span aria-hidden="true">▶</span> Play intro</button></div>
       <p id="film-play-status" class="film-play-status" role="status" hidden></p>
-      <figcaption><span id="film-caption">20 seconds · English · Music and sound effects</span><a href="${film.video}" download="nc-overview.mp4">Download video <span aria-hidden="true">↓</span></a></figcaption>
+      <figcaption><span id="film-caption">20 seconds · English · Music and sound effects</span><a href="${film.video}" download="nc-overview.mp4">Download <span aria-hidden="true">↓</span></a></figcaption>
     </figure>
     <details id="film-transcript" class="film-transcript"><summary>Read the video transcript</summary><div class="film-transcript-body">
       <p>Original electronic instrumental music plays throughout. Dry mechanical clicks mark scene and tab changes; the compiler signal travels from left to right.</p>
@@ -59,31 +36,65 @@ return `<main id="main">
       </ol>
     </div></details>
   </section>
-  <section id="from-c" class="design-choices wrap section-space" aria-labelledby="choices-title"><div class="section-top"><div><p class="eyebrow">For systems programmers</p><h2 id="choices-title">More of the contract<br>belongs in the language.</h2></div><p class="section-description">The goal is C-class control with a wider, continuous model. These are the design choices behind that goal.</p></div>
-    <div class="design-ledger"><article><div><span class="ledger-symbol" translate="no">[@machine]</span><h3>A typed machine boundary</h3></div><div><p>GNU extended asm describes instructions through a template and operand constraints. nC's machine layer represents instructions, labels and control transfers in the language model, with contracts carried through semantic analysis and IR.</p><a href="library/the-machine-layer.html">Read the machine-layer contract</a><a class="context-reference" href="https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html">C context: GCC extended asm</a></div></article>
-    <article><div><span class="ledger-symbol" translate="no">size / align / ABI</span><h3>Representation you can inspect</h3></div><div><p>Layout, alignment and calling conventions change what a program does. nC treats representation and linkage as part of its continuous model. Memory remains manual/raw: allocation, valid addresses and release stay under program control.</p><a href="library/memory-and-representation.html">Read about memory and representation</a></div></article>
-    <article><div><span class="ledger-symbol" translate="no">source → IR → image</span><h3>A compiler you can trace</h3></div><div><p>The path from a declaration to native bytes should be inspectable. ncc exposes analysis and emission routes; the public bootstrap records source identities, providers and artifact comparisons for named generations.</p><a href="#architecture">Inspect the compiler phases</a><a class="context-reference" href="#evidence">Review the published evidence</a></div></article></div>
-    <p class="contract-footnote">nC is in active native bootstrap. The public edition's documented contracts define today's supported scope; they are the starting point for evaluating the language.</p>
-  </section>
-  <section id="architecture" class="continuity-section section-space"><div class="wrap"><div class="section-top"><div><p class="eyebrow">Inside the compiler</p><h2>Follow the program through ncc.</h2></div><p class="section-description">Explore the compiler pipeline.<br>Select a phase to inspect its responsibility.</p></div><div class="continuity-grid"><div class="pipeline-map" role="tablist" aria-label="Compiler phases" aria-orientation="vertical">${phases.map((phase,i)=>`<button role="tab" id="phase-tab-${i}" aria-selected="${i===0}" aria-controls="phase-panel" tabindex="${i===0?'0':'-1'}" class="phase ${i===0?'active':''}" data-phase="${i}"><span class="phase-index">0${i+1}</span><span class="phase-name">${phase[0]}<small>${phase[2]}</small></span><code>${phase[1]}</code><span class="phase-indicator" aria-hidden="true">↗</span></button>`).join('')}</div>
-    <div class="phase-panel" id="phase-panel" role="tabpanel" aria-labelledby="phase-tab-0" tabindex="0"><div class="phase-panel-top"><span class="eyebrow" id="phase-label">01 / SOURCE</span><span class="contract-tag">Phase reference</span></div><div class="contract-visual" aria-hidden="true"><div><span class="contract-mark" id="phase-mark">.n</span><span class="contract-caption">nC / semantic continuity</span></div></div><h3 id="phase-title">Declare the program.</h3><p id="phase-description">Functions, typed places and imports define program units. Visibility, control flow and representation must retain their identity through analysis.</p><div class="phase-detail"><span>Source reference</span><code id="phase-code">examples/00_hello/hello.n</code></div><a class="text-link" id="phase-link" href="library/the-first-program.html">Read the contract <span>↗</span></a></div></div></div></section>
 
-  <section id="run" class="first-program run wrap section-space" aria-labelledby="first-program-title">
-    <div class="run-head"><p class="eyebrow">From zero to a native executable</p><h2 id="first-program-title">Three steps.<br>One real binary.</h2><p class="section-description">Pick your system, save the program and run the commands. The replay follows a verified run of the public kit.</p></div>
-    <div class="terminal-tabs run-os" role="tablist" aria-label="Operating system"><button role="tab" id="os-windows" aria-selected="true" aria-controls="terminal-panel" data-os="windows">Windows <small>x86-64</small></button><button role="tab" id="os-linux" aria-selected="false" aria-controls="terminal-panel" tabindex="-1" data-os="linux">Linux / WSL <small>x86-64</small></button></div>
-    <div class="run-grid">
-      <div class="run-card">
-        <ol class="run-steps"><li><span class="run-badge">1</span><div><h3>Get ncc</h3><p>Download the native kit for your system and run the self-test. <a href="downloads.html">Get the kit</a></p></div></li><li><span class="run-badge">2</span><div><h3>Save hello.n</h3><p>The program prints one line and returns true from its final.</p></div></li><li><span class="run-badge">3</span><div><h3>Build and run</h3><p>emit-executable produces a native PE or ELF file you can run directly.</p></div></li></ol>
-        <div class="source-window"><div class="window-bar"><span><i></i> hello.n</span><button class="copy-hero" type="button" aria-label="Copy the hello.n source">Copy source</button></div><pre><code>${highlightNC(hello)}</code></pre><a href="library/the-first-program.html">Read the annotated example <span>↗</span></a></div>
-      </div>
-      <div class="terminal"><div class="run-bar"><span class="run-dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="terminal-shell">PowerShell · inside the extracted kit</span><span class="run-actions"><button id="copy-commands" type="button" aria-label="Copy commands for the selected system">Copy</button><button id="run-replay" type="button">Run <span aria-hidden="true">▸</span></button></span></div><div id="terminal-panel" role="tabpanel" aria-labelledby="os-windows"><pre id="terminal-commands"><code>${escape(recipe)}</code></pre><div class="terminal-output" aria-live="polite"><span>Expected output</span><pre>Hello, nC public beta</pre><small><i></i> Exit code 0</small></div><p class="terminal-limit">Replay of the verified public-kit run. See the <a href="${release}">release notes</a> for supported commands and platform requirements.</p></div></div>
+  <section class="ag-statement" data-form="drift">
+    <p>nC is a systems programming language in native bootstrap. Ordinary source, foundational contracts, machine instructions and material primitives share <em>one typed model</em>, so the meaning of a program survives all the way down.</p>
+  </section>
+
+  <section class="ag-row" data-form="strata" aria-labelledby="read-title">
+    <div class="ag-copy">
+      <h2 id="read-title">Read nC</h2>
+      <p>Four surfaces of the same language: functions, root contracts, typed machine control and hardware primitives. Switch between them and read the real source.</p>
+      <a class="ag-link" href="nc-programming-language.html">Explore the language <span aria-hidden="true">→</span></a>
     </div>
-    <div class="section-foot"><span>Keep the compiler and its runtime provider together.</span><a href="downloads.html">Get the native kit <span>↗</span></a></div>
+    <div class="ag-media ag-glow">${renderSurfaceExplorer(surfaces,repo)}</div>
   </section>
 
-  <section id="evidence" class="evidence-section wrap section-space" aria-labelledby="evidence-title"><div class="section-top"><div><p class="eyebrow">Public edition</p><h2 id="evidence-title">Evidence you can open.</h2></div><a class="text-link" href="${repo}/releases/tag/v0.1.0-bootstrap.81">Read the V81 release notes</a></div><div class="evidence-layout"><div class="release-ledger"><table><caption>Bootstrap V81: published scope</caption><tbody><tr><th scope="row">Native kits</th><td>Windows x86-64 and Linux / WSL x86-64</td></tr><tr><th scope="row">Reconstruction</th><td>B2 and C2 are byte-identical within each documented host.</td></tr><tr><th scope="row">Language contract</th><td>Manual/raw memory, explicit representation and typed machine surfaces.</td></tr><tr><th scope="row">Open work</th><td>Full native CLI coverage and global Stage3 promotion.</td></tr></tbody></table></div><aside class="evidence-notes"><h3>Read the result with its inputs.</h3><p>The V81 dossier records 74 units per reconstruction, 147 corpus programs and 38 runtime contracts per generation and host.</p><p>These figures identify a published validation scope. They are not a cross-language performance comparison.</p><a href="${repo}/blob/main/docs/NCC_MODULES_V81_DOSSIER.md">Open the technical dossier</a><a href="${repo}/blob/main/docs/NCC_MODULES_V81_REPRO.md">Reproduce the reconstruction</a></aside></div></section>
-  <section id="language-levels" class="cinematic-hero symbol-section wrap" aria-labelledby="symbol-title"><div class="symbol-copy"><p class="eyebrow">The idea behind nC</p><h2 id="symbol-title">One language.<br>Every layer.</h2><p>A function, a pointer, an instruction and a linked image belong to the same program. nC is being built to keep their contracts connected.</p><a class="text-link" href="library/contracts-between-levels.html">Read about semantic continuity</a></div><figure class="hero-visual" aria-label="The nC project symbol: a luminous sphere above an open hand, with an orbital halo and copper particle tide"><div class="hero-atmosphere" aria-hidden="true"></div><div class="fallback-halo" aria-hidden="true"></div><div class="orb-fallback" aria-hidden="true"></div><canvas id="continuity-canvas" aria-hidden="true"></canvas><span class="orb-light-shaft" aria-hidden="true"></span><div class="hand-layer" aria-hidden="true"><img class="hand-photo" src="assets/hand-hero-v1.webp" width="1536" height="1024" loading="lazy" decoding="async" alt=""><img class="hand-illumination" src="assets/hand-hero-v1.webp" width="1536" height="1024" loading="lazy" decoding="async" alt=""><span class="palm-light"></span></div><svg class="tidal-fallback" viewBox="0 0 1440 350" preserveAspectRatio="none" aria-hidden="true"><defs><pattern id="tidal-dots" width="12" height="10" patternUnits="userSpaceOnUse"><circle cx="2" cy="3" r=".7" fill="#bd875d"/></pattern></defs><path d="M0 60 Q300 40 600 180 T1100 100 T1440 60 V350 H0Z" fill="url(#tidal-dots)"/></svg></figure><output id="scene-status" hidden data-renderer="waiting" data-cls="0" data-max-event-ms="0"></output></section>
-  <section class="learning wrap section-space" aria-labelledby="learning-title"><div class="section-top"><div><p class="eyebrow">Documentation</p><h2 id="learning-title">A language is also<br>the way you learn it.</h2></div><a class="text-link" href="library.html">Browse all 16 chapters</a></div><div class="documentation-routes"><a href="library.html#origen-y-guia"><span class="manual-index">nC</span><div><h3>The language guide</h3><p>Design, syntax, explicit memory and the first native program.</p><span>8 chapters · PDF available</span></div><span class="route-arrow" aria-hidden="true">↗</span></a><a href="library.html#arquitectura-y-bootstrap"><span class="manual-index">ncc</span><div><h3>The compiler reference</h3><p>Parser, AST, semantics, IR, ABI, linking and bootstrap evidence.</p><span>8 chapters · PDF available</span></div><span class="route-arrow" aria-hidden="true">↗</span></a></div></section>
-  <section class="contribute wrap"><canvas class="lift-field" data-field="cta" aria-hidden="true"></canvas><div><p class="eyebrow">Built in the open</p><h2>Read it. Build it.<br>Help define it.</h2><p>Useful reports start with a minimal program, a complete command and an observable result.</p></div><div class="actions"><a class="button primary" href="${repo}">Inspect the source</a><a class="text-link" href="${repo}/blob/main/CONTRIBUTING.md">Read the contribution guide</a></div></section>
+  <section id="architecture" class="ag-row ag-row-flip" data-form="stream" aria-labelledby="ncc-title">
+    <div class="ag-copy">
+      <h2 id="ncc-title">Follow it through ncc</h2>
+      <p>Five phases, from declaration to native image. Select one to see what it is responsible for.</p>
+      <a class="ag-link" href="ncc-compiler.html">Inside the compiler <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="ag-media ag-glow"><div class="continuity-grid"><div class="pipeline-map" role="tablist" aria-label="Compiler phases" aria-orientation="vertical">${phases.map((phase,i)=>`<button role="tab" id="phase-tab-${i}" aria-selected="${i===0}" aria-controls="phase-panel" tabindex="${i===0?'0':'-1'}" class="phase ${i===0?'active':''}" data-phase="${i}"><span class="phase-index">0${i+1}</span><span class="phase-name">${phase[0]}<small>${phase[2]}</small></span><code>${phase[1]}</code><span class="phase-indicator" aria-hidden="true">↗</span></button>`).join('')}</div>
+    <div class="phase-panel" id="phase-panel" role="tabpanel" aria-labelledby="phase-tab-0" tabindex="0"><div class="phase-panel-top"><span class="eyebrow" id="phase-label">01 / SOURCE</span><span class="contract-tag">Phase reference</span></div><div class="contract-visual" aria-hidden="true"><div><span class="contract-mark" id="phase-mark">.n</span><span class="contract-caption">nC / semantic continuity</span></div></div><h3 id="phase-title">Declare the program.</h3><p id="phase-description">Functions, typed places and imports define program units. Visibility, control flow and representation must retain their identity through analysis.</p><div class="phase-detail"><span>Source reference</span><code id="phase-code">examples/00_hello/hello.n</code></div><a class="text-link" id="phase-link" href="library/the-first-program.html">Read the contract <span>↗</span></a></div></div></div>
+  </section>
+
+  <section id="run" class="ag-row run" data-form="vortex" aria-labelledby="first-program-title">
+    <div class="ag-copy">
+      <h2 id="first-program-title">Run it</h2>
+      <p>Save the program as hello.n, then build and run a native executable. Press Run to replay a verified run of the public kit.</p>
+      <div class="terminal-tabs run-os" role="tablist" aria-label="Operating system"><button role="tab" id="os-windows" aria-selected="true" aria-controls="terminal-panel" data-os="windows">Windows</button><button role="tab" id="os-linux" aria-selected="false" aria-controls="terminal-panel" tabindex="-1" data-os="linux">Linux / WSL</button></div>
+      <a class="ag-link" href="downloads.html">Get the native kit <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="ag-media ag-glow ag-run">
+      <div class="source-window"><div class="window-bar"><span>hello.n</span><button class="copy-hero" type="button" aria-label="Copy the hello.n source">Copy</button></div><pre><code>${highlightNC(hello)}</code></pre></div>
+      <div class="terminal"><div class="run-bar"><span id="terminal-shell">PowerShell · inside the extracted kit</span><span class="run-actions"><button id="copy-commands" type="button" aria-label="Copy commands for the selected system">Copy</button><button id="run-replay" type="button">Run <span aria-hidden="true">▸</span></button></span></div><div id="terminal-panel" role="tabpanel" aria-labelledby="os-windows"><pre id="terminal-commands"><code>${escape(recipe)}</code></pre><div class="terminal-output" aria-live="polite"><pre>Hello, nC public beta</pre></div></div></div>
+    </div>
+  </section>
+
+  <section id="from-c" class="ag-choices" data-form="drift" aria-labelledby="choices-title">
+    <h2 id="choices-title">Built for systems programmers</h2>
+    <div class="ag-three">
+      <article><code translate="no">[@machine]</code><h3>A typed machine boundary</h3><p>Instructions, labels and control transfers live in the language model instead of an asm template.</p><a class="ag-link" href="library/the-machine-layer.html">The machine layer <span aria-hidden="true">→</span></a></article>
+      <article><code translate="no">size / align / ABI</code><h3>Representation you can inspect</h3><p>Layout, alignment and calling conventions are part of the model. Memory stays manual.</p><a class="ag-link" href="library/memory-and-representation.html">Memory and representation <span aria-hidden="true">→</span></a></article>
+      <article><code translate="no">source → IR → image</code><h3>A compiler you can trace</h3><p>Analysis and emission routes are exposed; the bootstrap records sources and artifact comparisons.</p><a class="ag-link" href="#evidence">Published evidence <span aria-hidden="true">→</span></a></article>
+    </div>
+  </section>
+
+  <section id="evidence" class="ag-row ag-row-flip" data-form="lattice" aria-labelledby="evidence-title">
+    <div class="ag-copy">
+      <h2 id="evidence-title">Evidence you can open</h2>
+      <p>Bootstrap V81 publishes its scope, its reconstruction and how to reproduce it. These figures identify a validation scope, not a performance comparison.</p>
+      <a class="ag-link" href="${repo}/blob/main/docs/NCC_MODULES_V81_REPRO.md">Reproduce the reconstruction <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="ag-media ag-glow"><table class="ag-table"><caption>Bootstrap V81: published scope</caption><tbody><tr><th scope="row">Native kits</th><td>Windows x86-64 and Linux / WSL x86-64</td></tr><tr><th scope="row">Reconstruction</th><td>B2 and C2 are byte-identical within each documented host.</td></tr><tr><th scope="row">Language contract</th><td>Manual/raw memory, explicit representation and typed machine surfaces.</td></tr><tr><th scope="row">Open work</th><td>Full native CLI coverage and global Stage3 promotion.</td></tr></tbody></table></div>
+  </section>
+
+  <section class="ag-end" data-form="orbit" aria-labelledby="end-title">
+    <h2 id="end-title">Read it. Build it.<br>Help define it.</h2>
+    <div class="ag-actions"><a class="ag-btn ag-btn-ink" href="downloads.html">Get ncc <span aria-hidden="true">↓</span></a><a class="ag-btn ag-btn-soft" href="${repo}">Inspect the source</a></div>
+    <p class="ag-quiet"><a href="library.html">Documentation</a><a href="${repo}/blob/main/CONTRIBUTING.md">Contribute</a><a href="${release}">Release notes</a></p>
+  </section>
   </main>`;
 }
