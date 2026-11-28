@@ -2,8 +2,8 @@ const base=document.body.dataset.base||'';
 if(document.querySelector('#nc-overview-video'))import('./film-player.js').then(module=>module.initFilmPlayer()).catch(()=>{});
 const toast=document.querySelector('.toast');let toastTimer;
 function notify(text){toast.textContent=text;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),2400);}
-function applyTheme(theme){document.documentElement.dataset.theme=theme;document.querySelector('meta[name="theme-color"]')?.setAttribute('content',theme==='dark'?'#101418':'#f4f6f7');document.querySelector('#theme').setAttribute('aria-label',theme==='dark'?'Switch to light theme':'Switch to dark theme');}
-try{applyTheme(localStorage.getItem('nc-theme')||'dark');}catch{}
+function applyTheme(theme){document.documentElement.dataset.theme=theme;document.querySelector('meta[name="theme-color"]')?.setAttribute('content',theme==='dark'?'#0b0c0f':'#ffffff');document.querySelector('#theme').setAttribute('aria-label',theme==='dark'?'Switch to light theme':'Switch to dark theme');}
+try{applyTheme(localStorage.getItem('nc-theme')||'light');}catch{}
 document.querySelector('#theme').onclick=()=>{const theme=document.documentElement.dataset.theme==='dark'?'light':'dark';applyTheme(theme);try{localStorage.setItem('nc-theme',theme);}catch{}};
 document.querySelector('#menu').onclick=()=>{const button=document.querySelector('#menu');const open=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(open));button.setAttribute('aria-label',open?'Close navigation':'Open navigation');button.textContent=open?'×':'☰';document.querySelector('#nav').classList.toggle('open',open);};
 async function copy(text){try{await navigator.clipboard.writeText(text);notify('Code copied');}catch{notify('Copy failed. Select the code and copy it manually.');}}

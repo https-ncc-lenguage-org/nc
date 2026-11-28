@@ -98,3 +98,24 @@ Verify the first screen, complete page, source tabs, keyboard state, source
 copying, installation, library, downloads, both themes, and the four canonical
 test viewports. Review long lines, text zoom, focus, anchors and code overflow.
 Record real measurements and verification limits in the publication report.
+
+## Lift revision (November 2026)
+
+The owner asked for a brighter, kinetic direction. The site now defaults to a
+luminous light theme (white `#ffffff`, ink `#121317`, grey `#5d6168`) with the
+dark theme kept as an alternative (`#0b0c0f`). Copper stays the brand accent;
+a restrained spectrum (copper → coral → magenta → violet → blue → teal → sage)
+is used only in the particle field, the showcase glow and card hover rims.
+
+- Hero: centered headline, primary "Get ncc" ink pill, secondary soft pill.
+  Behind it, `field.js` draws an orbit of short strokes on a Canvas 2D layer
+  that assemble on load, part around the pointer and settle back. It obeys the
+  shared motion toggle, reduced motion, visibility and off-screen pausing, and
+  caps DPR at 2. The same script drives an upward "antigravity" drift in the
+  closing call to action.
+- The source explorer remains the first content object, presented as a large
+  rounded showcase over a soft spectrum glow, with pill tabs.
+- Sections use generous spacing, 20–36 px radii, soft surfaces instead of
+  rules, and lift-on-hover cards. The project symbol is the one dark stage.
+- Content, routes, claims, accessibility and verification rules above are
+  unchanged.

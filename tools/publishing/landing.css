@@ -47,3 +47,7 @@
 .film-transcript pre{margin:16px 0;padding:16px;background:var(--code);border:1px solid var(--line);border-radius:4px;white-space:pre-wrap;overflow-wrap:anywhere}
 .film-transcript a{display:inline-block;min-height:44px;padding-block:9px;color:var(--text);text-decoration:underline}
 @media(max-width:600px){.film-play{left:14px;bottom:14px;padding:10px 13px;font-size:13px}.film-player figcaption{padding:10px 14px;gap:0;align-items:flex-start;flex-direction:column;font-size:12px}.film-transcript li{grid-template-columns:1fr;gap:5px}.film-transcript-body{font-size:14px}.film-transcript pre{padding:12px}}
+
+/* Lift design */
+.symbol-section{border-radius:36px;border:0;background:#07080a}
+@media(max-width:640px){.symbol-section{border-radius:26px}}
